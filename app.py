@@ -1,5 +1,5 @@
 from flask import Flask,request,jsonify
-from module.userController import userDispatch
+from lib.module.userController import userDispatch
 app = Flask(__name__)
 
 @app.route('/')
