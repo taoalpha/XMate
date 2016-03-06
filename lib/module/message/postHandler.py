@@ -1,7 +1,3 @@
-from ...db_module.userModule import CUser
-
-db_model = CUser()
-connection = db_model.buildConnection()
 
 FIELDS = {
     "profile": ["username","age","gender","preferred","address"],
@@ -13,7 +9,7 @@ FIELDS = {
 }
 
 # define the profile update for post
-def postData(request,res):
+def postData(request,res,db):
     if connection["status"]:
         res["content"]["status"] = "successful"
         return res
@@ -22,7 +18,7 @@ def postData(request,res):
     for key in request.form:
         data[key] = request.form[key]
     data["uid"] = int(data["uid"])
-    docs = db_model.insertData(data)
+    docs = db.insertData(data)
     res["err"] = docs
 
     #FIXME: change uid to object ID

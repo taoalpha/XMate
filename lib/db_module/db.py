@@ -22,9 +22,9 @@ class CDatabase:
             Args:
                 url_name: the url of the database
         '''
+
         try:
             self.client = pymongo.MongoClient(url_name,connect = True, serverSelectionTimeoutMS = 1000)
-
             self.db = self.client.get_default_database()
             return self.returnHelper()
         except:
@@ -157,15 +157,10 @@ class CDatabase:
         return_val = {}
         return_val["status"] = status
         return_val["msg"] = msg
-        return_val["error"] = sys.exc_info()[0]
+        return_val["error"] = sys.exc_info()
         return_val["content"] = content
 
         return return_val
-
-
-
-
-
 
 
 

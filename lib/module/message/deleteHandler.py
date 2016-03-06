@@ -1,8 +1,4 @@
-from ...db_module.userModule import CUser
 from bson.objectid import ObjectId
-
-db_model = CUser()
-connection = db_model.buildConnection()
 
 FIELDS = {
     "profile": ["username","age","gender","preferred","address"],
@@ -14,7 +10,7 @@ FIELDS = {
 }
 
 # define the getAll function
-def delData(request,res):
+def delData(request,res,db):
     '''
         Desc:
             fetch all data about the user
@@ -42,7 +38,7 @@ def delData(request,res):
     data = {"_id":ObjectId(res["uid"])}
 
     # data = {"sid":{"$in":schedule_list}}
-    docs = db_model.removeData(data)
+    docs = db.removeData(data)
 
     # error handler for getting data
     if docs["status"]:
