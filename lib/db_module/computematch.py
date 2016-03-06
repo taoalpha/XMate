@@ -34,19 +34,21 @@ def getTimeDiff(time1,time2):
 
 
 def giveSearchResult(post_content, mydb):
-    dis_threshold = 2.0
-    match_list = {}
 
-    ploc = post_content["location"]
-    pt = post_content["time_range"]
-    ptype = post_content["type"]
+    res = mydb.selectCollection("xmatePost") ###### 
+    if(res['status']):
+        print(res)
+    dis_threshold = 2.0  
+    match_list = {}   
+    docu_list = []
 
-    if(ptype == None):
+
+    if(post_content["type"] == None):
         pass
     else:
         match_list["type"] = ptype
-
-    if(pt == None):
+    
+    if(post_content["time_range"] == None):
         pass
     else: 
         st = post_content["time_range"]["start_time"]
@@ -54,24 +56,20 @@ def giveSearchResult(post_content, mydb):
         match_list["time_range.start_time"] = {'$gt': st}
         match_list["time_range.end_time"] = {'$lt': en}
 
-    mydb.selectCollection("xmatePost") ######
-    print(match_list)
-    res = mydb.getData(match_list)     #####
-
+    res = mydb.getData(match_list)
     if(res["status"]):
         print(res)
     else:
         cursor = res["content"]
 
-    docu_list = []
-    if(ploc == None):
+    if(post_content["location"] == None):
         for doc in cursor:
             docu_list.append(doc)
         docu_list.sort(key = lambda postd: postd["post_datetime"], reverse = True)
     else:
 
         for doc in cursor:
-            dist = calculateDistance(doc["location"], ploc)
+            dist = calculateDistance(doc["location"], post_content["location"])
             if(dist < dis_threshold):
                 doc["diff"] = dist
                 docu_list.append(doc)
@@ -79,14 +77,25 @@ def giveSearchResult(post_content, mydb):
 
     return docu_list
 
+def computeMatchPosts(uid, post_content, mydb):
+    
+    res = mydb.selectCollection("xmatePost") ###### 
+    if(res['status']):
+        print(res)
+
+    dis_threshold = 2.0
+    match_list = {}
 
 
-# def computeMatchPosts(uid, post_content):
 
 
 
-# def computeMatchUsers(uid, post_content):
-#     pass
+
+
+
+
+
+def computeMatchUsers(uid, post_content):
 
 
 

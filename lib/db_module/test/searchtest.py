@@ -1,16 +1,13 @@
 import string, random, sys
 from db import CDatabase
 from computematch import giveSearchResult
-
-
-
 # student_tuples = [
 #     {"name":"john","grade":"A","age":15},
 #     {"name":"jane","grade":"B","age":10},
 #     {"name":"dave","grade":"C","age":12},
 #     {"name":"david","grade":"B","age":12},
 #     {"name":"Tom","grade":"A","age":12}
-# ]
+# ]s
 # a = sorted(student_tuples, key=lambda student: (student["age"],student['grade']))
 # print(a)
 # student_tuples.sort(key = lambda s: s["grade"], reverse=True)
