@@ -1,7 +1,7 @@
 import sys, pymongo
 
 class CDatabase:
-    '''    
+    '''
         client: the client connected to the server
         db: the default database in the server
     '''
@@ -19,8 +19,8 @@ class CDatabase:
             return self.returnHelper()
         except:
             return self.returnHelper(1,"Failed to build the database connection")
-        
-        
+
+
     def closeConnection(self):
         '''Close the connection to database'''
         try:
@@ -28,13 +28,13 @@ class CDatabase:
             return self.returnHelper()
         except:
             return self.returnHelper(1,"Failed to close the database connection")
-            
+
 
     def insertData(self,data):
         '''insert one document(data: jason type document) into specified collection, return its id'''
         try:
             res = self.collection.insert_one(data)
-            return self.returnHelper(content = res) 
+            return self.returnHelper(content = res)
         except:
             return self.returnHelper(1,"Failed to insert data")
 
@@ -43,7 +43,7 @@ class CDatabase:
         try:
             res = self.collection.insert_many(data)
             print(self.collection.count())
-            return self.returnHelper(content = res) 
+            return self.returnHelper(content = res)
         except:
             return self.returnHelper(1,"Failed to insert many data")
 

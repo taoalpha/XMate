@@ -10,7 +10,7 @@ def hello_world():
     return 'The api interface'
 
 @app.route('/user/', defaults={'uid':None, 'action': None},methods=['GET', 'POST'])
-@app.route('/user/<uid>', defaults={'action': None},methods=['GET', 'PUT'])
+@app.route('/user/<uid>', defaults={'action': None},methods=['GET', 'PUT', 'DELETE'])
 @app.route('/user/<uid>/<action>')
 def user(uid,action):
     return jsonify(**userDispatch(uid,action,request))

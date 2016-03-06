@@ -6,6 +6,7 @@ connection = db_model.buildConnection()
 
 FIELDS = {
     "profile": ["username","age","gender","preferred","address"],
+    #"profile": ["username","age","gender","preferred","address","height","width","avatar"],
     "schedule": ["schedule_list"],
     "DELETE": ["_id"],
     "history": ["history_events","history_partner"],
@@ -61,26 +62,32 @@ def getData(request,res):
     #
     # normal process
     #
+
     for doc in docs["content"]:
         for i,key in enumerate(FIELDS["DELETE"]):
             # remove all non-neccessary fields
-            del doc[key]
-        res["rawdata"] = doc
+            # del doc[key]
+            doc[key] = str(doc[key])
+        if docs["content"].count() > 1:
+            res["rawdata"]["entries"] = []
+            res["rawdata"]["entries"].append(doc)
+        else:
+            res["rawdata"] = doc
     return res
 
 # define the filterData function
 def filterData(request,res):
     '''
         Desc:
-            Filter data with action parameter
+            Filter data with field parameter
         Args:
             request : request object
             res : result needs to return
     '''
-    if res["action"] == None:
+    if res["field"] == None:
         res["content"] = res["rawdata"]
         return res
     else:
-        for i,field in enumerate(FIELDS[res["action"]]):
+        for i,field in enumerate(FIELDS[res["field"]]):
             res["content"][field] = res["rawdata"][field]
         return res

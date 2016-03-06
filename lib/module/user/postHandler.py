@@ -18,8 +18,13 @@ def postData(request,res):
         res["content"]["status"] = "successful"
         return res
 
-    data = request.form
+    data = {}
+    for key in request.form:
+        data[key] = request.form[key]
+    data["uid"] = int(data["uid"])
     docs = db_model.insertData(data)
-    res["content"]["status"] = docs["status"]
-    res["content"]["uid"] = docs["uid"]
+    res["err"] = docs
+
+    #FIXME: change uid to object ID
+    res["content"]["_id"] = str(docs["content"].inserted_id)
     return res
