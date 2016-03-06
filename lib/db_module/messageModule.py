@@ -1,5 +1,5 @@
 import sys, pymongo
-from .db import CDatabase
+from db import CDatabase
 
 class CMessage(CDatabase):
     def __init__(self):
