@@ -1,12 +1,11 @@
 import sys, random, time
 from datetime import datetime
 from geopy.distance import vincenty
-from db import CDatabase
 
 
 def calculateDistance(pointa, pointb):
     '''
-        Desc: 
+        Desc:
             Compute distance between pointa and pointb
         Args:
             pointa, pointb = {"latitude":..., "lonfitude":...}(must contain these two keys)
@@ -20,33 +19,33 @@ def calculateDistance(pointa, pointb):
 
 def getTimeDiff(time1,time2):
     '''
-        Desc: 
-            Get time difference   
+        Desc:
+            Get time difference
         Args:
             time: realtime - 1970.1.1 seconds
         Ret:
             two time's difference(minutes)
     '''
     timediff = (time1 - time2) / 60
-    return abs(timediff) 
-       
+    return abs(timediff)
+
 
 def giveSearchResult(post_content, mydb):
     '''
-        Desc: 
+        Desc:
             Give "search" result
-            
+
         Args:
             mydb: CDatabase object()
             post_content: {"type:"..., "time_range":..., "location":...}
         Ret:
             Return the result documents list
     '''
-    res = mydb.selectCollection("xmatePost") ###### 
+    res = mydb.selectCollection("xmatePost") ######
     if(res['status']):
         print(res)
-    dis_threshold = 2.0  
-    match_list = {}   
+    dis_threshold = 2.0
+    match_list = {}
     docu_list = []
 
 
@@ -54,10 +53,10 @@ def giveSearchResult(post_content, mydb):
         pass
     else:
         match_list["type"] = post_content["type"]
-    
+
     if(post_content["time_range"] == None):
         pass
-    else: 
+    else:
         st = post_content["time_range"]["start_time"]
         en = post_content["time_range"]["end_time"]
         match_list["time_range.start_time"] = {'$gt': st}
@@ -85,8 +84,10 @@ def giveSearchResult(post_content, mydb):
     return docu_list
 
 def computeMatchPosts(uid, post_content, mydb):
-    
-    res = mydb.selectCollection("xmatePost") ###### 
+
+    print(post_content)
+
+    res = mydb.selectCollection("xmatePost") ######
     if(res['status']):
         print(res)
 
@@ -105,6 +106,7 @@ def computeMatchPosts(uid, post_content, mydb):
     match_list["time_range.start_time"] = {'$gt': datetime.timestamp(nst)}
     match_list["time_range.end_time"] = {'$lt': datetime.timestamp(nen)}
 
+
     res = mydb.getData(match_list)
     if(res["status"]):
         print(res)
@@ -118,6 +120,7 @@ def computeMatchPosts(uid, post_content, mydb):
         dist = calculateDistance(doc["location"], post_content["location"])
         if(dist < dis_threshold):
             doc["diff"] = dist
+            doc["_id"] = str(doc["_id"])
             docu_list.append(doc)
     docu_list.sort(key = lambda postd: (postd["post_datetime"],postd["diff"]))
 

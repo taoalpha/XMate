@@ -1,3 +1,4 @@
+import json
 from flask import Flask,request,jsonify
 from lib.module.userController import userDispatch
 from lib.module.scheduleController import scheduleDispatch
@@ -12,6 +13,7 @@ db.buildConnection()
 # TODO: try catch db connection
 
 app = Flask(__name__)
+app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 
 @app.route('/')
 def hello_world():
@@ -21,8 +23,13 @@ def hello_world():
 @app.route('/user/<uid>', defaults={'action': None},methods=['GET', 'PUT', 'DELETE'])
 @app.route('/user/<uid>/<action>')
 def user(uid,action):
+    status = db.getStatus()
+    if status["status"] == 1:
+        db.buildConnection()
     db.selectCollection("xmateUser")
-    return jsonify(**userDispatch(uid,action,request,db))
+    #return jsonify(**userDispatch(uid,action,request,db))
+    #return json.dumps(userDispatch(uid,action,request,db))
+    return "callback("+json.dumps(userDispatch(uid,action,request,db))+")"
 
 
 @app.route('/schedule', defaults={'sid':None, 'action': None},methods=['GET', 'POST'])

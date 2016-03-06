@@ -1,4 +1,5 @@
 from bson.objectid import ObjectId
+from ...db_module import computematch as CM
 
 FIELDS = {
     "profile": ["username","age","gender","preferred","address"],
@@ -59,6 +60,8 @@ def getData(request,res,db):
     # normal process
     #
 
+    res["err"]["status"] = 0
+
     for doc in docs["content"]:
         for i,key in enumerate(FIELDS["DELETE"]):
             # remove all non-neccessary fields
@@ -72,7 +75,7 @@ def getData(request,res,db):
     return res
 
 # define the filterData function
-def filterData(request,res):
+def filterData(request,res,db):
     '''
         Desc:
             Filter data with field parameter
@@ -83,7 +86,13 @@ def filterData(request,res):
     if res["field"] == None:
         res["content"] = res["rawdata"]
         return res
-    else:
-        for i,field in enumerate(FIELDS[res["field"]]):
-            res["content"][field] = res["rawdata"][field]
+    elif res["field"] == "search":
+        print(res["rawdata"])
+        res["content"] = dict(CM.giveSearchResult(res["rawdata"],db))
+        print(res["content"])
+        return res
+    elif res["field"] == "match":
+        res["content"]["entries"] = []
+        res["content"]["entries"] = CM.computeMatchPosts(10,res["rawdata"],db)
+        print(len(res["content"]["entries"]))
         return res

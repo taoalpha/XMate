@@ -28,6 +28,9 @@ def scheduleDispatch(sid,field,request,db):
 
     DISPATCH[request.method](request,res,db)
 
+    if res["err"]["status"]:
+        return res["err"]
+
     # dispatch with field and args
     if field != None:
         getHandler.filterData(request,res,db)
