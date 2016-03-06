@@ -1,7 +1,4 @@
-from ...db_module.userModule import CUser
-
-db_model = CUser()
-connection = db_model.buildConnection()
+from bson.objectid import ObjectId
 
 FIELDS = {
     "profile": ["username","age","gender","preferred","address"],
@@ -13,18 +10,18 @@ FIELDS = {
 }
 
 # define the profile update for post
-def postData(request,res):
-    if connection["status"]:
-        res["content"]["status"] = "successful"
-        return res
+def postData(request,res,db):
+    #if connection["status"]:
+    #    res["content"]["status"] = "successful"
+    #    return res
 
     data = {}
     for key in request.form:
         data[key] = request.form[key]
-    data["uid"] = int(data["uid"])
-    docs = db_model.insertData(data)
+    data["sid"] = int(data["sid"])
+    docs = db.insertData(data)
     res["err"] = docs
 
-    #FIXME: change uid to object ID
+    #FIXME: change sid to object ID
     res["content"]["_id"] = str(docs["content"].inserted_id)
     return res

@@ -16,7 +16,7 @@ DISPATCH = {
 }
 
 # define dispatch handler for user
-def userDispatch(uid,field,request):
+def userDispatch(uid,field,request,db):
     '''
         Desc:
             dispatch request to proper handelr
@@ -33,7 +33,7 @@ def userDispatch(uid,field,request):
     res["err"] = {"status":0}
     # dispatch with method
 
-    DISPATCH[request.method](request,res)
+    DISPATCH[request.method](request,res,db)
 
     if res["err"]["status"]:
         return res["err"]
