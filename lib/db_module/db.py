@@ -28,6 +28,10 @@ class CDatabase:
             return self.returnHelper()
         except:
             return self.returnHelper(1,"Failed to build the database connection")
+
+    # def getStauts()
+
+
     def selectCollection(self, coll_name):
         '''
             Desc:
