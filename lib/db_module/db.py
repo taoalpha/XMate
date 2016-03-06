@@ -22,9 +22,11 @@ class CDatabase:
             Args:
                 url_name: the url of the database
         '''
+
         try:
-            self.client = pymongo.MongoClient(url_name)
-            self.db = self.client.get_default_database()
+            self.client = pymongo.MongoClient(url_name,serverSelectionTimeoutMS=1000)
+            #self.db = self.client.get_default_database()
+            self.db = self.client.test
             return self.returnHelper()
         except:
             return self.returnHelper(1,"Failed to build the database connection")
@@ -143,15 +145,10 @@ class CDatabase:
         return_val = {}
         return_val["status"] = status
         return_val["msg"] = msg
-        return_val["error"] = sys.exc_info()[0]
+        return_val["error"] = sys.exc_info()
         return_val["content"] = content
 
         return return_val
-
-
-
-
-
 
 
 
