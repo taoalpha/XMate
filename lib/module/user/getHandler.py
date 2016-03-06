@@ -1,11 +1,8 @@
-from ...db_module.userModule import CUser
 from bson.objectid import ObjectId
-
-db_model = CUser()
-connection = db_model.buildConnection()
 
 FIELDS = {
     "profile": ["username","age","gender","preferred","address"],
+    #"profile": ["username","age","gender","preferred","address","height","width","avatar"],
     "schedule": ["schedule_list"],
     "DELETE": ["_id"],
     "history": ["history_events","history_partner"],
@@ -14,7 +11,7 @@ FIELDS = {
 }
 
 # define the getAll function
-def getData(request,res):
+def getData(request,res,db):
     '''
         Desc:
             fetch all data about the user
@@ -29,10 +26,10 @@ def getData(request,res):
     '''
 
     # error handler for connection
-    if connection["status"]:
-        res["err"]["status"] = 1
-        res["err"]["msg"] = "fail to connect"
-        return res
+    #if connection["status"]:
+    #    res["err"]["status"] = 1
+    #    res["err"]["msg"] = "fail to connect"
+    #    return res
 
     # error handler for invalid objectid
     if not ObjectId.is_valid(res["uid"]):
@@ -44,7 +41,7 @@ def getData(request,res):
         data = {"_id":ObjectId(res["uid"])}
 
     # data = {"sid":{"$in":schedule_list}}
-    docs = db_model.getData(data)
+    docs = db.getData(data)
 
     # error handler for getting data
     if docs["status"]:
@@ -61,26 +58,32 @@ def getData(request,res):
     #
     # normal process
     #
+
     for doc in docs["content"]:
         for i,key in enumerate(FIELDS["DELETE"]):
             # remove all non-neccessary fields
-            del doc[key]
-        res["rawdata"] = doc
+            # del doc[key]
+            doc[key] = str(doc[key])
+        if docs["content"].count() > 1:
+            res["rawdata"]["entries"] = []
+            res["rawdata"]["entries"].append(doc)
+        else:
+            res["rawdata"] = doc
     return res
 
 # define the filterData function
 def filterData(request,res):
     '''
         Desc:
-            Filter data with action parameter
+            Filter data with field parameter
         Args:
             request : request object
             res : result needs to return
     '''
-    if res["action"] == None:
+    if res["field"] == None:
         res["content"] = res["rawdata"]
         return res
     else:
-        for i,field in enumerate(FIELDS[res["action"]]):
+        for i,field in enumerate(FIELDS[res["field"]]):
             res["content"][field] = res["rawdata"][field]
         return res

@@ -1,7 +1,7 @@
 import sys, pymongo
 
 class CDatabase:
-    '''    
+    '''
         client: the client connected to the server
         db: the default database in the server
 
@@ -29,8 +29,6 @@ class CDatabase:
         except:
             return self.returnHelper(1,"Failed to build the database connection")
 
-    # def getStauts()
-
 
     def selectCollection(self, coll_name):
         '''
@@ -44,7 +42,7 @@ class CDatabase:
             return self.returnHelper()
         except:
             return self.returnHelper(1,"Failed to select connection")
-      
+
     def closeConnection(self):
         '''
             Desc:
@@ -55,7 +53,7 @@ class CDatabase:
             return self.returnHelper()
         except:
             return self.returnHelper(1,"Failed to close the database connection")
-            
+
 
     def insertData(self,data):
         '''
@@ -68,7 +66,7 @@ class CDatabase:
         '''
         try:
             res = self.collection.insert_one(data)
-            return self.returnHelper(content = res) 
+            return self.returnHelper(content = res)
         except:
             return self.returnHelper(1,"Failed to insert data")
 
@@ -83,14 +81,14 @@ class CDatabase:
         '''
         try:
             res = self.collection.insert_many(data)
-            return self.returnHelper(content = res) 
+            return self.returnHelper(content = res)
         except:
             return self.returnHelper(1,"Failed to insert many data")
 
     def getData(self, match_list):
         '''
             Desc:
-                get documents by match_list 
+                get documents by match_list
             Args:
                 match_list is a json type dict, {"key":value",...}
             Ret:
@@ -136,7 +134,7 @@ class CDatabase:
     def returnHelper(self, status = 0, msg = None,content = None):
         '''
             Desc:
-                Handle all the other functions' return value 
+                Handle all the other functions' return value
             Args:
                 status: 0 no error, 1 exception; msg: where the error occur
                 content: store the result; error: system error information

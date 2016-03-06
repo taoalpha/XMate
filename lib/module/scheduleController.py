@@ -10,28 +10,27 @@ from .schedule import deleteHandler as deleteHandler
 DISPATCH = {
     "GET": getHandler.getData,
     "POST": postHandler.postData,
-    "PUT":{
-    },
-    "DELETE":{
-    },
-    "PATCH":{
-    }
+    "PUT": putHandler.putData,
+    "DELETE": deleteHandler.delData,
 }
 
-def scheduleDispatch(uid,action,request):
+def scheduleDispatch(sid,field,request,db):
     res = {}
-    res["action"] = action
-    res["uid"] = uid
+    res["field"] = field
+    res["sid"] = sid
+    res["err"] = {}
+
     # content stores all validate information
+
     res["rawdata"] = {}
     res["content"] = {}
     # dispatch with method
 
-    DISPATCH[request.method](request,res)
+    DISPATCH[request.method](request,res,db)
 
-    # dispatch with action and args
-    if action != None:
-        getHandler.filterData(request,res)
+    # dispatch with field and args
+    if field != None:
+        getHandler.filterData(request,res,db)
     else:
         res["content"] = res["rawdata"]
     return res["content"]

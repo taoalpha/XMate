@@ -11,15 +11,21 @@ DISPATCH = {
     "GET": getHandler.getData,
     "POST": postHandler.postData,
     "PUT": putHandler.putData,
-    "DELETE":{
-    },
-    "PATCH":{
-    }
+    "DELETE": deleteHandler.delData,
+    #"PATCH": patchHandler.patchData,
 }
 
-def userDispatch(uid,action,request):
+# define dispatch handler for user
+def userDispatch(uid,field,request,db):
+    '''
+        Desc:
+            dispatch request to proper handelr
+        Args:
+            uid: user id, None if no
+            field: specify the return combination of the data
+    '''
     res = {}
-    res["action"] = action
+    res["field"] = field
     res["uid"] = uid
     # content stores all validate information
     res["rawdata"] = {}
@@ -27,17 +33,14 @@ def userDispatch(uid,action,request):
     res["err"] = {"status":0}
     # dispatch with method
 
-    DISPATCH[request.method](request,res)
-
-    print(res)
+    DISPATCH[request.method](request,res,db)
 
     if res["err"]["status"]:
-        print(res)
         return res["err"]
 
-    # dispatch with action and args
+    # dispatch with field and args
     if request.method == "GET":
-        if action != None:
+        if field != None:
             getHandler.filterData(request,res)
         else:
             res["content"] = res["rawdata"]
