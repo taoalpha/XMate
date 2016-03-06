@@ -6,7 +6,8 @@ from lib.module.messageController import messageDispatch
 from lib.db_module.db import CDatabase
 # connect with db
 db = CDatabase()
-connection = db.buildConnection()
+db.buildConnection()
+#db.buildConnection("localhost:27017")
 
 # TODO: try catch db connection
 
