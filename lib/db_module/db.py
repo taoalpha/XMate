@@ -24,12 +24,24 @@ class CDatabase:
         '''
 
         try:
-            self.client = pymongo.MongoClient(url_name,serverSelectionTimeoutMS=1000)
-            #self.db = self.client.get_default_database()
-            self.db = self.client.test
+            self.client = pymongo.MongoClient(url_name,connect = True, serverSelectionTimeoutMS = 1000)
+            self.db = self.client.get_default_database()
             return self.returnHelper()
         except:
             return self.returnHelper(1,"Failed to build the database connection")
+
+    def getStauts(self):
+        '''
+            Desc:
+                Get the server info to see whether the connection is failed
+                Build long-time connection to db
+        '''
+        try:
+            self.client.server_info()
+            return self.returnHelper()
+        except:
+            return self.returnHelper(1,"Connection lost")
+
 
     def selectCollection(self, coll_name):
         '''

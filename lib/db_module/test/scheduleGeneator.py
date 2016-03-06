@@ -1,12 +1,11 @@
-from postModule import CPost
-from historyPostModule import CHistoryPost
-from userModule import CUser
 import random
 import datetime, time
+from db import CDatabase
 
 def generateSchedule():
-	user_db = CUser()
+	user_db = CDatabase()
 	aa = user_db.buildConnection()
+	user_db.selectCollection('xmateUser')
 	# print(aa)
 
 	# get all users in a list
@@ -103,14 +102,16 @@ def generateSchedule():
 	print(len(history_res))
 
 	# write to schedule db
-	schedule_db = CPost()
+	schedule_db = CDatabase()
 	schedule_db.buildConnection()
+	schedule_db.selectCollection('xmatePost')
 	schedule_db.insertManyData(schedule_res)
 	schedule_db.closeConnection()
 
 	# write to history schedule db
-	history_db = CHistoryPost()
+	history_db = CDatabase()
 	history_db.buildConnection()
+	history_db.selectCollection('xmateHistoryPost')
 	history_db.insertManyData(history_res)
 	history_db.closeConnection()
 
