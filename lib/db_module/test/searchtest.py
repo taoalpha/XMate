@@ -1,6 +1,6 @@
 import string, random, sys
 from db import CDatabase
-from computematch import giveSearchResult
+import computematch
 # student_tuples = [
 #     {"name":"john","grade":"A","age":15},
 #     {"name":"jane","grade":"B","age":10},
@@ -34,10 +34,11 @@ post_content = {
         "city": "Ithaca"
     }
 }
-reslist = giveSearchResult(post_content, mydatabase)
+
+reslist = computematch.computeMatchPosts(10,post_content, mydatabase)
 print(len(reslist))
 for i in range(0,5):
-    print(reslist[i]["type"], reslist[i]["location"], reslist[i]["time_range"])
+    print(reslist[i]["type"], reslist[i]["time_range"]["start_time"],reslist[i]["time_range"]["start_time"])
     if('diff' in reslist[0]):
         print(reslist[i]["diff"])
 
