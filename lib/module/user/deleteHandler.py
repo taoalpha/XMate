@@ -1,4 +1,3 @@
-from ...db_module.userModule import CUser
 from bson.objectid import ObjectId
 
 FIELDS = {

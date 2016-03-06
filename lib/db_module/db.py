@@ -30,7 +30,7 @@ class CDatabase:
         except:
             return self.returnHelper(1,"Failed to build the database connection")
 
-    def getStauts(self):
+    def getStatus(self):
         '''
             Desc:
                 Get the server info to see whether the connection is failed

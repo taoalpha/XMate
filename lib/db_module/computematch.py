@@ -34,7 +34,16 @@ def getTimeDiff(time1,time2):
 
 
 def giveSearchResult(post_content, mydb):
-
+    '''
+        Desc: 
+            Give "search" result
+            
+        Args:
+            mydb: CDatabase object()
+            post_content: {"type:"..., "time_range":..., "location":...}
+        Ret:
+            Return the result documents list
+    '''
     res = mydb.selectCollection("xmatePost") ###### 
     if(res['status']):
         print(res)
