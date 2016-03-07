@@ -1,25 +1,34 @@
-FIELDS = {
-    "profile": ["username","age","gender","preferred","address"],
-    "schedule": ["schedule_list"],
-    "DELETE": ["_id"],
-    "history": ["history_events","history_partner"],
-    "stats": ["rate","lasttime_login","credits"],
-    "message": ["unprocessed_message"]
-}
+#!/usr/bin/python
 
 # define the profile update for post
 def postData(request,res,db):
-    #if connection["status"]:
-    #    res["content"]["status"] = "successful"
-    #    return res
+    '''
+        Desc:
+            Post to create a new user
+        Args:
+            request: with all information, may only use request.form
+            res: result stores mainly created uid
+            db: a reference to db
+        Return:
+            uid: ObjectId
+    '''
 
+    # store requested form
     data = {}
     for key in request.form:
         data[key] = request.form[key]
+
+    # convert uid to int, can be deleted later(we don't need uid, use ObjectId instead)
     data["uid"] = int(data["uid"])
     docs = db.insertData(data)
+
+    # store the return from inserting into res
     res["err"] = docs
 
-    #FIXME: change sid to object ID
+    # deal with inserting error
+    if docs["status"] == 1:
+        return res
+
+    # store the ObjectId to _id
     res["content"]["_id"] = str(docs["content"].inserted_id)
     return res

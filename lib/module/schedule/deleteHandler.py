@@ -1,33 +1,17 @@
 from bson.objectid import ObjectId
 
-FIELDS = {
-    "profile": ["username","age","gender","preferred","address"],
-    "schedule": ["schedule_list"],
-    "DELETE": ["_id"],
-    "history": ["history_events","history_partner"],
-    "stats": ["rate","lasttime_login","credits"],
-    "message": ["unprocessed_message"]
-}
-
-# define the getAll function
+# define the delete function
 def delData(request,res,db):
     '''
         Desc:
-            fetch all data about the user
+            delete the schedule exercise by id
         Args:
-            request: request with different data
-            res: result that we need to update and return
+            request: maybe useful
+            res: id stores in res["sid"], and update res with proper information
         Err:
-            1. connection err
-            2. invalid objectId
-            3. fail to delete data
+            1. invalid objectId
+            2. fail to delete data
     '''
-
-    # error handler for connection
-    #if connection["status"]:
-    #    res["err"]["status"] = 1
-    #    res["err"]["msg"] = "fail to connect"
-    #    return res
 
     # error handler for invalid objectid
     if not ObjectId.is_valid(res["sid"]):
@@ -48,4 +32,5 @@ def delData(request,res,db):
     #
     # normal process
     #
+    res["content"]["status"] = "successful"
     return res

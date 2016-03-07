@@ -1,5 +1,7 @@
+#!/usr/bin/python
 from bson.objectid import ObjectId
 
+# define all combination of attributes contained in each field
 FIELDS = {
     "profile": ["username","age","gender","preferred","address"],
     #"profile": ["username","age","gender","preferred","address","height","width","avatar"],
@@ -10,7 +12,7 @@ FIELDS = {
     "message": ["unprocessed_message"]
 }
 
-# define the getAll function
+# define the getData function
 def getData(request,res,db):
     '''
         Desc:
@@ -19,18 +21,10 @@ def getData(request,res,db):
             request: request with different data
             res: result that we need to update and return
         Err:
-            1. connection err
-            2. invalid objectId
-            3. fail to get data
-            4. no match result
+            1. invalid objectId
+            2. fail to get data
+            3. no match result
     '''
-
-    # error handler for connection
-    #if connection["status"]:
-    #    res["err"]["status"] = 1
-    #    res["err"]["msg"] = "fail to connect"
-    #    return res
-
     # error handler for invalid objectid
     if not ObjectId.is_valid(res["uid"]):
         #res["err"]["status"] = 1
@@ -41,29 +35,35 @@ def getData(request,res,db):
         data = {"_id":ObjectId(res["uid"])}
 
     # data = {"sid":{"$in":schedule_list}}
+    # get the data based on uid
+    # docs:
+    #   status: success or not
+    #   content: cursor contains the result
     docs = db.getData(data)
 
     # error handler for getting data
+    # return early
     if docs["status"]:
         res["err"] = docs
         return res
 
     # error handler for no match result
+    # return early
     if docs["content"].count() == 0:
         res["err"]["status"] = 1
         res["err"]["msg"] = "no matches"
         return res
 
-
     #
     # normal process
     #
-
     for doc in docs["content"]:
-        for i,key in enumerate(FIELDS["DELETE"]):
+        #for i,key in enumerate(FIELDS["DELETE"]):
             # remove all non-neccessary fields
-            # del doc[key]
-            doc[key] = str(doc[key])
+        # convert objectId to string for jsonify
+        doc["_id"] = str(doc["_id"])
+
+        # just in case we have multiple matches (should not happen for uid search)
         if docs["content"].count() > 1:
             res["rawdata"]["entries"] = []
             res["rawdata"]["entries"].append(doc)
@@ -80,10 +80,13 @@ def filterData(request,res):
             request : request object
             res : result needs to return
     '''
+
+    # double check the res["field"], if no need to filter, return
     if res["field"] == None:
         res["content"] = res["rawdata"]
         return res
     else:
+        # return attributes based on pre-defined FIELDS
         for i,field in enumerate(FIELDS[res["field"]]):
             res["content"][field] = res["rawdata"][field]
         return res

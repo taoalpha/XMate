@@ -1,19 +1,19 @@
+#!/usr/bin/python
+
 from bson.objectid import ObjectId
-FIELDS = {
-    "profile": ["username","age","gender","preferred","address"],
-    "schedule": ["schedule_list"],
-    "DELETE": ["_id"],
-    "history": ["history_events","history_partner"],
-    "stats": ["rate","lasttime_login","credits"],
-    "message": ["unprocessed_message"]
-}
 
 # define the profile update for post
 def putData(request,res,db):
-    #if connection["status"]:
-    #    res["content"]["status"] = "successful"
-    #    return res
-
+    '''
+        Desc:
+            Put to update user attributes
+        Args:
+            request: with all information, may only use request.form
+            res: status after updating
+            db: a reference to db
+        Return:
+            res
+    '''
     if not ObjectId.is_valid(res["uid"]):
         #res["err"]["status"] = 1
         #res["err"]["msg"] = "wrong id"
