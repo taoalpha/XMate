@@ -35,6 +35,12 @@ def userDispatch(uid,field,request,db):
     # store err msg
     res["err"] = {"status":0}
 
+    # forbid deleting users from the http request
+    if request.method == "DELETE":
+	res["err"]["status"] = 1
+	res["err"]["msg"] = "Forbidden operation!!"
+	return res["err"]
+
     # dispatch with method: GET/POST/PUT/DELETE
     DISPATCH[request.method](request,res,db)
 
