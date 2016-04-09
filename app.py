@@ -29,7 +29,7 @@ def user(uid,action):
     db.selectCollection("xmateUser")
     #return jsonify(**userDispatch(uid,action,request,db))
     #return json.dumps(userDispatch(uid,action,request,db))
-    return "callback("+json.dumps(userDispatch(uid,action,request,db))+")"
+    return json.dumps(userDispatch(uid,action,request,db))
 
 
 @app.route('/schedule', defaults={'sid':None, 'action': None},methods=['GET', 'POST'])
