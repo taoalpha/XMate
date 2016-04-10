@@ -28,7 +28,7 @@ def scheduleDispatch(sid,field,request,db):
     res["sid"] = sid
 
     # store any possible err msg
-    res["err"] = {}
+    res["err"] = {"status":0}
 
     # rawdata stores all rough information
     res["rawdata"] = {}

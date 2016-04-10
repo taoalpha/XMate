@@ -22,20 +22,13 @@ def delData(request,res,db):
             2. invalid objectId
             3. fail to delete data
     '''
-
-    # error handler for connection
-    if connection["status"]:
-        res["err"]["status"] = 1
-        res["err"]["msg"] = "fail to connect"
-        return res
-
     # error handler for invalid objectid
-    if not ObjectId.is_valid(res["uid"]):
+    if not ObjectId.is_valid(res["mid"]):
         res["err"]["status"] = 1
         res["err"]["msg"] = "wrong id"
         return res
 
-    data = {"_id":ObjectId(res["uid"])}
+    data = {"_id":ObjectId(res["mid"])}
 
     # data = {"sid":{"$in":schedule_list}}
     docs = db.removeData(data)

@@ -9,11 +9,7 @@ FIELDS = {
 
 # define the profile update for post
 def putData(request,res,db):
-    if connection["status"]:
-        res["content"]["status"] = "successful"
-        return res
-
-    match_data = {"uid":int(res["uid"])}
+    match_data = {"mid":int(res["mid"])}
     data = request.form
     docs = db.updateData(match_data,data)
     res["content"]["status"] = docs["status"]
