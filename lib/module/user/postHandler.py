@@ -19,7 +19,6 @@ def postData(request,res,db):
         data[key] = request.form[key]
 
     # convert uid to int, can be deleted later(we don't need uid, use ObjectId instead)
-    data["uid"] = int(data["uid"])
     docs = db.insertData(data)
 
     # store the return from inserting into res

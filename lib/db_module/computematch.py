@@ -1,5 +1,6 @@
 import sys, random, time
 from datetime import datetime
+import moment
 from geopy.distance import vincenty
 
 
@@ -95,16 +96,22 @@ def computeMatchPosts(uid, post_content, mydb):
     match_list = {}
     docu_list = []
 
-    st = datetime.fromtimestamp(post_content["time_range"]["start_time"])
-    en = datetime.fromtimestamp(post_content["time_range"]["start_time"])
+    #st = datetime.fromtimestamp(post_content["time_range"]["start_time"])
+    st = moment.unix(post_content["time_range"]["start_time"])
+    #en = datetime.fromtimestamp(post_content["time_range"]["start_time"])
+    en = moment.unix(post_content["time_range"]["start_time"])
 
-    nst = datetime(st.year, st.month, st.day, 0)
-    nen = datetime(st.year, st.month, st.day, 23,59)
+    #nst = datetime(st.year, st.month, st.day, 0)
+    nst = moment.date(st.year, st.month, st.day, 0).epoch()
+    #nen = datetime(st.year, st.month, st.day, 23,59)
+    nen = moment.date(st.year, st.month, st.day, 23,59).epoch()
 
 
     match_list["type"] = post_content["type"]
-    match_list["time_range.start_time"] = {'$gt': datetime.timestamp(nst)}
-    match_list["time_range.end_time"] = {'$lt': datetime.timestamp(nen)}
+    #match_list["time_range.start_time"] = {'$gt': datetime.timestamp(nst)}
+    match_list["time_range.start_time"] = {'$gt': nst}
+    #match_list["time_range.end_time"] = {'$lt': datetime.timestamp(nen)}
+    match_list["time_range.end_time"] = {'$lt': nen}
 
 
     res = mydb.getData(match_list)
