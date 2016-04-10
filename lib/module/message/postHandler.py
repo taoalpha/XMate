@@ -10,15 +10,12 @@ FIELDS = {
 
 # define the profile update for post
 def postData(request,res,db):
-    if connection["status"]:
-        res["content"]["status"] = "successful"
-        return res
-
     data = {}
     for key in request.form:
         data[key] = request.form[key]
-    data["uid"] = int(data["uid"])
+    # print data
     docs = db.insertData(data)
+    # print docs
     res["err"] = docs
 
     #FIXME: change uid to object ID

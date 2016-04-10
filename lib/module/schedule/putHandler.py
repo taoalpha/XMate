@@ -1,18 +1,18 @@
 from bson.objectid import ObjectId
-FIELDS = {
-    "profile": ["username","age","gender","preferred","address"],
-    "schedule": ["schedule_list"],
-    "DELETE": ["_id"],
-    "history": ["history_events","history_partner"],
-    "stats": ["rate","lasttime_login","credits"],
-    "message": ["unprocessed_message"]
-}
 
-# define the profile update for post
+# define the update for post
 def putData(request,res,db):
-    #if connection["status"]:
-    #    res["content"]["status"] = "successful"
-    #    return res
+    '''
+        Desc:
+            update some fields of a schedule exercise
+        Args:
+            request: store the updated information of exercise within request.form
+            db: referrence to db object
+            res: store the status
+        Err:
+            1. fail to update data
+    '''
+
 
     if not ObjectId.is_valid(res["sid"]):
         #res["err"]["status"] = 1
@@ -22,8 +22,14 @@ def putData(request,res,db):
     else:
         match_data = {"_id":ObjectId(res["sid"])}
 
+    docs = db.updateData(match_data,request.form)
 
-    data = request.form
-    docs = db.updateData(match_data,data)
+    # catch the error of updating
+    if docs["status"]:
+        res["err"] = docs
+        return res
+
+    # return the status
     res["content"]["status"] = docs["status"]
+
     return res

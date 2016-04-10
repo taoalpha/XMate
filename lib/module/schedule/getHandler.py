@@ -1,36 +1,19 @@
 from bson.objectid import ObjectId
+from ...db_module import computematch as CM
 
-FIELDS = {
-    "profile": ["username","age","gender","preferred","address"],
-    #"profile": ["username","age","gender","preferred","address","height","width","avatar"],
-    "schedule": ["schedule_list"],
-    "DELETE": ["_id"],
-    "history": ["history_events","history_partner"],
-    "stats": ["rate","lasttime_login","credits"],
-    "message": ["unprocessed_message"]
-}
-
-# define the getAll function
+# define the getData function
 def getData(request,res,db):
     '''
         Desc:
-            fetch all data about the user
+            fetch all data about the schedule
         Args:
             request: request with different data
             res: result that we need to update and return
         Err:
-            1. connection err
-            2. invalid objectId
-            3. fail to get data
-            4. no match result
+            1. invalid objectId
+            2. fail to get data
+            3. no match result
     '''
-
-    # error handler for connection
-    #if connection["status"]:
-    #    res["err"]["status"] = 1
-    #    res["err"]["msg"] = "fail to connect"
-    #    return res
-
     # error handler for invalid objectid
     if not ObjectId.is_valid(res["sid"]):
         #res["err"]["status"] = 1
@@ -59,11 +42,10 @@ def getData(request,res,db):
     # normal process
     #
 
+    res["err"]["status"] = 0
+
     for doc in docs["content"]:
-        for i,key in enumerate(FIELDS["DELETE"]):
-            # remove all non-neccessary fields
-            # del doc[key]
-            doc[key] = str(doc[key])
+        doc["_id"] = str(doc["_id"])
         if docs["content"].count() > 1:
             res["rawdata"]["entries"] = []
             res["rawdata"]["entries"].append(doc)
@@ -72,7 +54,7 @@ def getData(request,res,db):
     return res
 
 # define the filterData function
-def filterData(request,res):
+def filterData(request,res,db):
     '''
         Desc:
             Filter data with field parameter
@@ -83,7 +65,17 @@ def filterData(request,res):
     if res["field"] == None:
         res["content"] = res["rawdata"]
         return res
-    else:
-        for i,field in enumerate(FIELDS[res["field"]]):
-            res["content"][field] = res["rawdata"][field]
+    elif res["field"] == "search":
+        # call search function to get search results
+        # search happens when no sid but field = search
+        # all parameters should pass in by request.form
+        res["content"]["entries"] = []
+        res["content"]["entries"] = CM.giveSearchResult(10,res["rawdata"],db)
+        return res
+    elif res["field"] == "match":
+        # call match function to get match results
+        # match happens when there is a sid and field = match
+        res["content"]["entries"] = []
+        res["content"]["entries"] = CM.computeMatchPosts(10,res["rawdata"],db)
+        print(len(res["content"]["entries"]))
         return res
