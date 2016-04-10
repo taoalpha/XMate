@@ -1,0 +1,3 @@
+1. Install mono from www.mono-project.com. Or refer to Mono.pdf in the documentation directory
+2. Download Vsync.cs from vsync.codeplex.com/releases/view/619088
+3. Compile the src code by typing "mcs -t:library Vsync.cs" in the command line. mcs comes with Mono.
