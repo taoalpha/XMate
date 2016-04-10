@@ -33,6 +33,8 @@ def getData(request,res,db):
     else:
         data = {"_id":ObjectId(res["mid"])}
 
+    print data
+
     # data = {"sid":{"$in":schedule_list}}
     docs = db.getData(data)
 

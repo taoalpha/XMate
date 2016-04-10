@@ -40,11 +40,11 @@ def schedule(sid,action):
     #db.selectCollection("xmateHistoryPost")
     return jsonify(**scheduleDispatch(sid,action,request,db))
 
-@app.route('/message', defaults={'mid':None, 'action': None},methods=['GET', 'POST'])
+@app.route('/message', defaults={'mid':None, 'action': None},methods=['GET', 'POST','PUT','DELETE'])
 @app.route('/message/<mid>', defaults={'action': None},methods=['DELETE','GET','POST','PUT'])
-@app.route('/message/<mid>/<action>')
+@app.route('/message/<mid>/<action>',methods=['GET','POST','PUT'])
 def message(mid,action):
-    db.selectCollection("xmateMsg")
+    db.selectCollection("xmateMessage")
     return jsonify(**messageDispatch(mid,action,request,db))
 
 if __name__ == '__main__':

@@ -5,6 +5,7 @@ from .message import getHandler as getHandler
 from .message import postHandler as postHandler
 from .message import putHandler as putHandler
 from .message import deleteHandler as deleteHandler
+from .message import msgDelivery as msgDelivery
 
 # define dispatch dictionary
 DISPATCH = {
@@ -39,12 +40,84 @@ def messageDispatch(mid,action,request,db):
     # forbid deleting message from the http request
     # all outdated message (>24 hours) will be deleted by our self-check procedure
     if request.method == "DELETE":
+        tempResp = msgDelivery.checkMsg(db)
 	res["err"]["status"] = 1
 	res["err"]["msg"] = "Forbidden operation!!"
+        res["err"]["content"] = tempResp
 	return res["err"]
 
-    # dispatch with method: GET/POST/PUT/DELETE
-    DISPATCH[request.method](request,res,db)
+    if request.method == "POST":
+        res["action"] = request.form["type"]
+        if res["action"] == "join":
+            tempRes = msgDelivery.sendJoin(request.form["sender"],request.form["post"],db)
+            if tempRes["status"] == 1:
+                # some errors happen
+                res["err"]["status"] = 1
+                res["err"]["msg"] = tempRes["msg"]
+                return res["err"]
+            else:
+                # reeturn the message id in our system
+                res["content"] = {"_id":tempRes["content"]}
+                return res["content"]
+        elif res["action"] == "invite":
+            tempRes = msgDelivery.sendInvitation(request.form["sender"], request.form["post"], request.form["receiver"], db)
+            if tempRes["status"] == 1:
+                # some errors happen
+                res["err"]["status"] = 1
+                res["err"]["msg"] = tempRes["msg"]
+                return res["err"]
+            else:
+                # reeturn the message id in our system
+                res["content"] = {"_id":tempRes["content"]}
+                return res["content"]
+    elif request.method == "PUT":
+        if res["action"] == "decline":
+            tempRes = msgDelivery.declineRequest(request.form["sender"], request.form["mid"], db)
+            if tempRes["status"] == 1:
+                # some errors happen
+                res["err"]["status"] = 1
+                res["err"]["msg"] = tempRes["msg"]
+                return res["err"]
+            else:
+                # success
+                res["content"] = {}
+                return res["content"]
+        elif res["action"] == "accept":
+            tempRes = msgDelivery.acceptRequest(request.form["sender"], request.form["mid"], db)
+            if tempRes["status"] == 1:
+                # some errors happen
+                res["err"]["status"] = 1
+                res["err"]["msg"] = tempRes["msg"]
+                return res["err"]
+            else:
+                # success accepted
+                res["content"] = {}
+                return res["content"]
+        elif (res["action"] == "leave" or request.form["type"]=="leave"):
+            tempRes = msgDelivery.leavePost(request.form["sender"], request.form["post"], db)
+            if tempRes["status"] == 1:
+                # some errors happen
+                res["err"]["status"] = 1
+                res["err"]["msg"] = tempRes["msg"]
+                return res["err"]
+            else:
+                # leave the group
+                res["content"] = {}
+                return res["content"]
+        elif res["action"] == "read" or request.form["type"]=="read":
+            # only for plain message -- type
+            tempRes = msgDelivery.finishReadMsg(request.form["sender"], request.form["mid"], db)
+            if tempRes["status"] == 1:
+                # some errors happen
+                res["err"]["status"] = 1
+                res["err"]["msg"] = tempRes["msg"]
+                return res["err"]
+            else:
+                # leave the group
+                res["content"] = {}
+                return res["content"]
+    elif request.method == "GET":
+        DISPATCH[request.method](request,res,db)
 
     # if any err, return with err status
     if res["err"]["status"]:

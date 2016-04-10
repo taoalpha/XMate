@@ -1,14 +1,14 @@
 import sys, random, time, moment
 from datetime import datetime
-from db import CDatabase
-
+from bson.objectid import ObjectId
+# from db import CDatabase
 
 
 def returnHelper(status = 0, msg = None,content = None):
     return_val = {}
     return_val["status"] = status
     return_val["msg"] = msg
-    return_val["content"] = content
+    return_val["content"] = str(content)
 
     return return_val
 
@@ -34,7 +34,7 @@ def createMsg(mtype, send_id, receive_id, post_id, content, mydb, create_time = 
 
     if(len(cursor) > 0):
         msg_id = cursor[0]["_id"]
-        res = mydb.update(match_list,{"create_time":msg["create_time"]})
+        res = mydb.updateData(match_list,{"create_time":msg["create_time"]})
         if(res["status"]):
             return res
     else:
@@ -42,18 +42,18 @@ def createMsg(mtype, send_id, receive_id, post_id, content, mydb, create_time = 
         if(res["status"]):
             return res
         msg_id = res["content"].inserted_id
-    
+
     return returnHelper(content = msg_id)
 
 
 
 
 def insertMessage(uid, msg_id, mydb):
-    
+
     res = mydb.selectCollection("xmateUser")
     if(res["status"]):
         return res
-    match_list = {"_id": uid}
+    match_list = {"_id": ObjectId(uid)}
     res = mydb.getData(match_list)
     if(res["status"]):
         return res
@@ -63,12 +63,12 @@ def insertMessage(uid, msg_id, mydb):
     if(msg_id in msg_list):
         pass
     else:
-        msg_list.append(msg_id)
+        msg_list.append(str(msg_id))
         ndata = {"unprocessed_message":msg_list}
         res = mydb.updateData(match_list, ndata)
         if(res["status"]):
             return res
-    
+
     return returnHelper(content = msg_id)
 
 
@@ -80,7 +80,7 @@ def sendJoin(uid, pid, mydb):
     res = mydb.selectCollection("xmatePost")
     if(res["status"]):
         return res
-    match_list = {"_id":pid}
+    match_list = {"_id":ObjectId(pid)}
     res = mydb.getData(match_list)
     if(res["status"]):
         return res
@@ -97,7 +97,7 @@ def sendJoin(uid, pid, mydb):
     res = mydb.selectCollection("xmateUser")
     if(res["status"]):
         return res
-    match_list = {"_id": uid}
+    match_list = {"_id": ObjectId(uid)}
     res = mydb.getData(match_list)
     if(res["status"]):
         return res
@@ -114,7 +114,7 @@ def sendJoin(uid, pid, mydb):
 
 
 
-def sendInvation(uid, pid, rid, mydb):
+def sendInvitation(uid, pid, rid, mydb):
     #create message
     res = createMsg("invation", uid, rid, pid, "You are invited to join the post",mydb)
     if(res["status"]):
@@ -122,7 +122,7 @@ def sendInvation(uid, pid, rid, mydb):
     msg_id = res["content"]
 
     return insertMessage(rid, msg_id, mydb)
-    
+
 
 
 def declineRequest(uid, mid, mydb):
@@ -130,7 +130,7 @@ def declineRequest(uid, mid, mydb):
     res = mydb.selectCollection("xmateMessage")
     if(res["status"]):
         return res
-    match_list = {"_id":mid}
+    match_list = {"_id":ObjectId(mid)}
     res = mydb.getData(match_list)
     if(res["status"]):
         return res
@@ -147,18 +147,18 @@ def declineRequest(uid, mid, mydb):
         res = mydb.selectCollection("xmatePost")
         if(res["status"]):
             return res
-        match_list = {"_id":post_id}
+        match_list = {"_id":ObjectId(post_id)}
         res = mydb.getData(match_list)
         if(res["status"]):
             return res
         cursor = list(res["content"])
         if(len(cursor) == 0):
-            return finshReadMsg(uid, mid, mydb)
+            return finishReadMsg(uid, mid, mydb)
         else:
             res = mydb.selectCollection("xmateUser")
             if(res["status"]):
                 return res
-            match_list = {"_id":uid}
+            match_list = {"_id":ObjectId(uid)}
             res = mydb.getData(match_list)
             if(res["status"]):
                 return res
@@ -176,7 +176,7 @@ def declineRequest(uid, mid, mydb):
     if(res["status"]):
         return res
 
-    return finshReadMsg(uid, mid, mydb)
+    return finishReadMsg(uid, mid, mydb)
 
 
 
@@ -188,7 +188,7 @@ def acceptRequest(uid, mid, mydb):
     res = mydb.selectCollection("xmateMessage")
     if(res["status"]):
         return res
-    match_list = {"_id":mid}
+    match_list = {"_id":ObjectId(mid)}
     res = mydb.getData(match_list)
     if(res["status"]):
         return res
@@ -204,7 +204,7 @@ def acceptRequest(uid, mid, mydb):
     res = mydb.selectCollection("xmatePost")
     if(res["status"]):
         return res
-    match_list = {"_id":post_id}
+    match_list = {"_id":ObjectId(post_id)}
     res = mydb.getData(match_list)
     if(res["status"]):
         return res
@@ -212,7 +212,7 @@ def acceptRequest(uid, mid, mydb):
     ##################################################################
     if(len(cursor) == 0):
         return returnHelper(1, msg = "The post has been deleted")
-    
+
     userid = ""
     if(msg_type == "join"):
         userid = sid
@@ -233,7 +233,7 @@ def acceptRequest(uid, mid, mydb):
     res = mydb.selectCollection("xmateUser")
     if(res["status"]):
         return res
-    match_list = {"_id":userid}
+    match_list = {"_id":ObjectId(userid)}
     res = mydb.getData(match_list)
     if(res["status"]):
         return res
@@ -241,14 +241,14 @@ def acceptRequest(uid, mid, mydb):
 
     post_list = cursor[0]["schedule_list"]
     conflict_list = cursor[0]["conflict_list"]
-    if(post_id in post_list):
+    if(str(post_id) in post_list):
         pass
     else:
         res = checkConflict(post_list, post_id, conflict_list, mydb)
         if(res["status"]):
             return res
-        post_list.append(post_id)
-        
+        post_list.append(str(post_id))
+
         res = mydb.selectCollection("xmateUser")
         if(res["status"]):
             return res
@@ -257,7 +257,7 @@ def acceptRequest(uid, mid, mydb):
         if(res["status"]):
             return res
 
-    return finshReadMsg(uid, mid, mydb)
+    return finishReadMsg(uid, mid, mydb)
 
 
 
@@ -266,7 +266,7 @@ def leavePost(uid, pid, mydb):
     res = mydb.selectCollection("xmatePost")
     if(res["status"]):
         return res
-    match_list = {"_id":pid}
+    match_list = {"_id":ObjectId(pid)}
     res = mydb.getData(match_list)
     if(res["status"]):
         return res
@@ -286,7 +286,7 @@ def leavePost(uid, pid, mydb):
             res = mydb.selectCollection("xmatePost")
             if(res["status"]):
                 return res
-            match_list = {"_id":pid}
+            match_list = {"_id":ObjectId(pid)}
             ndata = {"owner":new_owner_id, "member":mem_list}
             res = mydb.updateData(match_list,ndata)
             if(res["status"]):
@@ -312,12 +312,12 @@ def leavePost(uid, pid, mydb):
             res = mydb.updateData(match_list,ndata)
             if(res["status"]):
                 return res
-    
+
     #delete post in the user's post list
     res = mydb.selectCollection("xmateUser")
     if(res["status"]):
         return res
-    match_list = {"_id":uid}
+    match_list = {"_id":ObjectId(uid)}
     res = mydb.getData(match_list)
     if(res["status"]):
         return res
@@ -345,7 +345,7 @@ def leavePost(uid, pid, mydb):
         res = mydb.selectCollection("xmateUser")
         if(res["status"]):
             return res
-        match_list = {"_id":uid}
+        match_list = {"_id":ObjectId(uid)}
         ndata = {"conflict_list":nconflict_list}
         res = mydb.updateData(match_list,ndata)
         if(res["status"]):
@@ -355,8 +355,8 @@ def leavePost(uid, pid, mydb):
         res = mydb.selectCollection("xmatePost")
         if(res["status"]):
             return res
-        match_list = {"_id": pid}
-        res = db.removeData(match_list)
+        match_list = {"_id": ObjectId(pid)}
+        res = mydb.removeData(match_list)
         if(res["status"]):
             return res
 
@@ -370,7 +370,10 @@ def updateConflict(post_list, mydb):
     res = mydb.selectCollection("xmatePost")
     if(res["status"]):
         return res
-    match_list = {"_id": {"$in": post_list}}
+    post_list_object = []
+    for i in post_list:
+        post_list_object.append(ObjectId(i))
+    match_list = {"_id": {"$in": post_list_object}}
     res = mydb.getData(match_list)
     if(res["status"]):
         return res
@@ -384,14 +387,14 @@ def updateConflict(post_list, mydb):
             stj = cursor[j]["time_range"]["start_time"]
             enj = cursor[j]["time_range"]["end_time"]
             if(max(sti,stj) < min(sti,stj)):
-                if(cursor[i]["_id"] in rlist):
+                if(str(cursor[i]["_id"]) in rlist):
                     pass
                 else:
-                    rlist.append(cursor[i]["_id"])
-                if(cursor[j]["_id"] in rlist):
+                    rlist.append(str(cursor[i]["_id"]))
+                if(str(cursor[j]["_id"]) in rlist):
                     pass
                 else:
-                    rlist.append(cursor[j]["_id"])
+                    rlist.append(str(cursor[j]["_id"]))
 
     return returnHelper(content = rlist)
 
@@ -410,7 +413,7 @@ def leavecheck(uid,pid,mydb):
     cursor = list(res["content"])
     if(len(cursor) > 0):
         return returnHelper(1,"You should first processe the join requests message associated with this post")
-    
+
     return returnHelper()
 
 
@@ -423,7 +426,10 @@ def checkConflict(post_list, postid, conflict_list, mydb):
     if(res["status"]):
         return res
     post_list.append(postid)
-    match_list = {"_id": {"$in": post_list}}
+    post_list_object = []
+    for i in post_list:
+        post_list_object.append(ObjectId(i))
+    match_list = {"_id": {"$in": post_list_object}}
     res = mydb.getData(match_list)
     if(res["status"]):
         return res
@@ -431,24 +437,24 @@ def checkConflict(post_list, postid, conflict_list, mydb):
     st = 0
     et = 0
     for doc in cursor:
-        if(doc["_id"] == postid):
+        if(str(doc["_id"]) == postid):
             st = doc["time_range"]["start_time"]
             et = doc["time_range"]["end_time"]
         else:
             pass
     flag = False
     for doc in cursor:
-        if(doc["_id"] == postid):
+        if(str(doc["_id"]) == postid):
             pass
         else:
             mst = max(st, doc["time_range"]["start_time"])
             met = min(et, doc["time_range"]["end_time"])
             if(mst < met):
                 flag = True
-                if(doc["_id"] in conflict_list):
+                if(str(doc["_id"]) in conflict_list):
                     pass
                 else:
-                    conflict_list.append(docu["_id"])
+                    conflict_list.append(str(doc["_id"]))
     if(flag):
         conflict_list.append(postid)
 
@@ -457,12 +463,12 @@ def checkConflict(post_list, postid, conflict_list, mydb):
 
 
 ##########################remind Tao to delete for plaintext
-def finshReadMsg(uid, mid, mydb):
+def finishReadMsg(uid, mid, mydb):
     #remove the message from the user unprocessed list
     res = mydb.selectCollection("xmateUser")
     if(res["status"]):
         return res
-    match_list = {"_id":uid}
+    match_list = {"_id":ObjectId(uid)}
     res = mydb.getData(match_list)
     if(res["status"]):
         return res
@@ -479,11 +485,11 @@ def finshReadMsg(uid, mid, mydb):
     res = mydb.selectCollection("xmateMessage")
     if(res["status"]):
         return res
-    match_list = {"_id":mid}
+    match_list = {"_id":ObjectId(mid)}
     res = mydb.removeData(match_list)
     if(res["status"]):
         return res
-    
+
     return returnHelper()
 
 
@@ -497,7 +503,8 @@ def checkMsg(mydb):
     #find out of date messages(more than 24hr)
     current_time = moment.now().epoch()
     st = current_time - 86400
-    match_list = {"created_time":{"$lt":st}}
+    print st
+    match_list = {"create_time":{"$lt":st}}
     res = mydb.getData(match_list)
     if(res["status"]):
         return res
@@ -506,19 +513,18 @@ def checkMsg(mydb):
     user_msg = {}
     outoftime_msg = []
     related_userlist = set()
-    
+
     if(len(cursor) == 0):
         return returnHelper()
     for msg in cursor:
         outoftime_msg.append(msg["_id"])
-        related_userlist.add(msg["receiver_id"])
-        if(msg["receiver_id"] in user_msg.keys()):
+        related_userlist.add(ObjectId(msg["receiver_id"]))
+        if(ObjectId(msg["receiver_id"]) in user_msg.keys()):
             pass
         else:
-            user_msg[msg["receiver_id"]] = []
-        user_msg[msg["receiver_id"]].append([msg["_id"]])
+            user_msg[ObjectId(msg["receiver_id"])] = []
+        user_msg[ObjectId(msg["receiver_id"])].append(msg["_id"])
     related_userlist = list(related_userlist)
-
 
     res = mydb.selectCollection("xmateUser")
     if(res["status"]):
@@ -542,6 +548,7 @@ def checkMsg(mydb):
         if(res["status"]):
             return res
 
+    print outoftime_msg
     #delete the messages in database
     res = mydb.selectCollection("xmateMessage")
     if(res["status"]):
