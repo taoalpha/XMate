@@ -83,8 +83,8 @@ def giveSearchResult(post_content, mydb):
         docu_list.sort(key = lambda postd: (postd["post_datetime"],postd["diff"]))
 
     return docu_list
-
-def computeMatchPosts(uid, post_content, mydb):
+#post_content --> sid
+def computeMatchPosts(sid, mydb):
     
     res = mydb.selectCollection("xmatePost") ###### 
     if(res['status']):

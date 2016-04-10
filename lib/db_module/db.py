@@ -124,7 +124,7 @@ class CDatabase:
                 # matched data by res.matched_count, # modified data by res.modified_count
         '''
         try:
-            res = self.collection.update_one(match_list, {"$set":data})
+            res = self.collection.update_many(match_list, {"$set":data})
             return self.returnHelper(content = res)
         except:
             return self.returnHelper(1,"Failed to update data")
@@ -152,7 +152,7 @@ class CDatabase:
                 status: 0 no error, 1 exception; msg: where the error occur
                 content: store the result; error: system error information
             Ret:
-                # matched data by res.matched_count, # modified data by res.modified_count
+                # return correct content or error message
         '''
         return_val = {}
         return_val["status"] = status
