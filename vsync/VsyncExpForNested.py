@@ -2,7 +2,7 @@
 from System import Action
 import clr
 clr.AddReference('VsyncLib') # The profile of the dll file.
-clr.AddReference('DataTypes') # The profile of the dll file.
+clr.AddReference('DataTypesExp') # The profile of the dll file.
 import Vsync
 import DataDefinition
 #from Vsync import *
@@ -58,7 +58,11 @@ profile.lastLoginTime = 20.2
 profile.height = 5.6
 profile.weight = 120
 print "Here 5"
-profile.addScheduleToList(12)
+
+sche = DataDefinition.scheduleUser()
+sche.postID = 12;
+sche.conflict = False;
+profile.addScheduleToList(sche)
 print "Here 6"
 g.Send(0, 17, profile)
 print "Here 7"

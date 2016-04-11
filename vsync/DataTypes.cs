@@ -26,16 +26,16 @@ namespace DataDefinition{
 		public float weight;
 
 		public int[] scheduleList;
-		//public int[] conflictlist;
-		//public int[] historyPartner;
-		//public int[] historyEvents;
-		//public int[] unprocessedMessage;
+		// TODO public int[] conflictlist;
+		// TODO public int[] historyPartner;
+		// TODO public int[] historyEvents;
+		// TODO public int[] unprocessedMessage;
 
 		public int scheduleIndex;
-		//public int conflictIndex;
-		//public int histPartIndex;
-		//public int histEventIndex;
-		//public int messageIndex;
+		// TODO public int conflictIndex;
+		// TODO public int histPartIndex;
+		// TODO public int histEventIndex;
+		// TODO public int messageIndex;
 
 		// Null constructor: Needed for AutoMarshaller	
 		public profile(){
@@ -65,11 +65,15 @@ namespace DataDefinition{
 			Console.WriteLine("Internal initialization");
 		}
 
+		// Incomplete implementation
+		// Seems never invoked
 		//public byte[] toBArray(){
 		//	Console.WriteLine("profile to array");
 		//	return Vsync.Msg.toBArray(FacebookID, ID,username);
 		//}
 
+		// Incomplete implementation
+		// Seems never invoked
 		//public profile(byte[] ba){
 		//	object[] obs = Msg.BArrayToObjects(ba); 
 		//	int idx = 0;
@@ -81,8 +85,10 @@ namespace DataDefinition{
 
 		public void addScheduleToList(int scheduleID){
 			if (scheduleList == null){
-				scheduleList = new int[16];
+				scheduleList = new int[16]; //default length
+				scheduleIndex = 0;
 			}else if (scheduleIndex + 1 == scheduleList.Length){
+				// if the array is already full, double the array size then copy the old data over
 				int[] temp = new int[scheduleList.Length * 2];
 				for (int i = 0; i < scheduleList.Length; i++){
 					temp[i] = scheduleList[i];
@@ -90,7 +96,7 @@ namespace DataDefinition{
 				scheduleIndex = scheduleList.Length;
 				scheduleList = temp;
 			}
-			scheduleList[scheduleIndex] = scheduleID;
+			scheduleList[scheduleIndex++] = scheduleID;
 			Console.WriteLine("Add a schedule to user's schedule list");
 		}
 
@@ -98,6 +104,7 @@ namespace DataDefinition{
 			string res =  "Get profile for user ID " + ID + " " + username + " with schedule ";
 			if (scheduleList != null){
 				for (int i = 0; i < scheduleList.Length; i++){
+					// not valid schedule ID
 					if (scheduleList[i] == 0){
 						break;
 					}
@@ -110,35 +117,38 @@ namespace DataDefinition{
 
 	//[AutoMarshalled]
 	//public class post{
+		// TODO
 		//fields
 
-	// Null constructor: Needed for AutoMarshaller
-	//	public post(){}
+		// Null constructor: Needed for AutoMarshaller
+		//public post(){}
 
-	// Internal construcotr used by the application to initialize a new object
-	//	internal post(int id){}
+		// Internal construcotr used by the application to initialize a new object
+		//internal post(int id){}
 	//}
 
 	//[AutoMarshalled]
 	//public class historyPost{
+		// TODO
 		//fields
 
-	// Null constructor: Needed for AutoMarshaller
-	//	public historyPost(){}
+		// Null constructor: Needed for AutoMarshaller
+		//public historyPost(){}
 
-	// Internal construcotr used by the application to initialize a new object
-	//	internal historyPost(int id){}
+		// Internal construcotr used by the application to initialize a new object
+		//internal historyPost(int id){}
 	//}
 
 	//[AutoMarshalled]
 	//public class message{
+		// TODO
 		//fields
 
-	// Null constructor: Needed for AutoMarshaller
-	//	public message(){}
+		// Null constructor: Needed for AutoMarshaller
+		//public message(){}
 
-	// Internal construcotr used by the application to initialize a new object
-	//	internal message(int id){}
+		// Internal construcotr used by the application to initialize a new object
+		//internal message(int id){}
 	//}
 
 	public class register{
