@@ -6,6 +6,7 @@ from .message import postHandler as postHandler
 from .message import putHandler as putHandler
 from .message import deleteHandler as deleteHandler
 from .message import msgDelivery as msgDelivery
+from . import checkController
 
 # define dispatch dictionary
 DISPATCH = {
@@ -40,7 +41,8 @@ def messageDispatch(mid,action,request,db):
     # forbid deleting message from the http request
     # all outdated message (>24 hours) will be deleted by our self-check procedure
     if request.method == "DELETE":
-        tempResp = msgDelivery.checkMsg(db)
+        #tempResp = checkController.checkMsg(db)
+        tempResp = checkController.checkSchedule(db)
 	res["err"]["status"] = 1
 	res["err"]["msg"] = "Forbidden operation!!"
         res["err"]["content"] = tempResp
