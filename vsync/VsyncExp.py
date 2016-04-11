@@ -1,21 +1,25 @@
 # required for Vsync
 from System import Action
 import clr
-clr.AddReference('VsyncLib') # The name of the dll file.
+clr.AddReference('VsyncLib') # The profile of the dll file.
+clr.AddReference('userDataType') # The profile of the dll file.
 import Vsync
+import DataDefinition
 #from Vsync import *
+
+import time
 
 Vsync.VsyncSystem.Start()
 
 Users = {}
 
 
-def addUser(id, name):
+def addUser(id, profile):
     print('Hello from addUser with id=' + id.ToString())
-    Users[id] = name
+    Users[id] = profile
     return
-def getName(id):
-    print('Hello from getName with id=' + id.ToString())
+def getProfile(id):
+    print('Hello from getProfile with id=' + id.ToString())
     g.Reply(Users[id])
     return
 def myViewFunc(v):
@@ -27,16 +31,30 @@ def myViewFunc(v):
         print('  Leaving: ' + a.ToString() + ', isMyAddress='+a.isMyAddress().ToString())
     return
 
-g = Vsync.Group('FooBar')
-g.RegisterHandler(0, Action[int, str](addUser))
-g.RegisterHandler(1, Action[int](getName))
+g = Vsync.Group('Experiment')
+
+g.RegisterHandler(0, Action[int, DataDefinition.userProfile](addUser))
+g.RegisterHandler(1, Action[int](getProfile))
 g.RegisterViewHandler(Vsync.ViewHandler(myViewFunc))
+DataDefinition.initializer()
+
 g.Join()
-g.Send(0, 17, "Yihui Fu")
-g.Send(0, 16, "Changsong Li")
-g.Send(0, 15, "Jerry, Mao")
+print "Line 43"
+
+yihui = DataDefinition.userProfile()
+print "Line 46"
+yihui.FacebookID = 123
+print "Line 48"
+yihui.id = 321
+print "Line 50"
+yihui.username = "Yihui"
+# yihui = DataDefinition.userProfile([123,321,"Yihui"])
+print "Line 52"
+
+g.Send(0, 17, yihui)
+# g.Send(0, 15, jerry)
 res = []
-nr = g.Query(Vsync.Group.ALL, 1, 15, Vsync.EOLMarker(), res);
+nr = g.Query(Vsync.Group.ALL, 1, 17, Vsync.EOLMarker(), res);
 print('After Query got ' + nr.ToString() + ' results: ', res)
 
 Vsync.VsyncSystem.WaitForever()
