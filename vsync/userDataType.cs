@@ -36,8 +36,32 @@ namespace DataDefinition{
 			username = name;
 		}
 
+		public byte[] toBArray(){
+			return Vsync.Msg.toBArray(FacebookID, id,username);
+		}
+
+		public userProfile(byte[] ba){
+			object[] obs = Msg.BArrayToObjects(ba); 
+			int idx = 0;
+			FacebookID = (int)obs[idx++];
+			id = (int)obs[idx++];
+			username = (string) obs[idx++];
+		}
+
+		public override string ToString(){
+			return FacebookID + " " + id + " " + username;
+		}
 	}
 
-	//internal const byte TID = 123; 
-	//Vsync.Msg.RegisterType(typeof(userProfile), 123);
+	public class initializer{
+		const byte TID = 123; 
+
+		public initializer(){
+			initialize();
+		}
+
+		public void initialize(){
+			Vsync.Msg.RegisterType(typeof(userProfile), TID);			
+		}	
+	}
 }
