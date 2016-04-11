@@ -3,13 +3,39 @@ from datetime import datetime
 from db import CDatabase
 #from msgdelivery import sendJoin
 
-# mydb = CDatabase()
-# res = mydb.buildConnection()
+mydb = CDatabase()
+res = mydb.buildConnection()
 
-# res = mydb.selectCollection("xmateUser")
-# match_list = {"uid":0}
-# ndata = {"gender":"male", "age":25}
-# res = mydb.updateData(match_list, ndata)
+res = mydb.selectCollection("xmateHistoryPost")
+mydb.removeData({})
+print list(mydb.getData({})["content"])
+
+res = mydb.selectCollection("xmatePost")
+mydb.removeData({})
+print list(mydb.getData({})["content"])
+
+res = mydb.selectCollection("xmateUser")
+mydb.removeData({})
+print list(mydb.getData({})["content"])
+
+res = mydb.selectCollection("xmateMessage")
+mydb.removeData({})
+print list(mydb.getData({})["content"])
+
+#print list(mydb.getData({})["content"])
+
+
+#match_list = {"fbid":"3"}
+#ndata = {"gender":"female", "age":28, "history_partner":[], "schedule_list":[],"history_events":[],"unprocessed_message":[],"fbid":"3"}
+#res = mydb.updateData({},{"conflict_list":[]})
+#print list(mydb.getData(match_list)["content"])[0]
+
+#res = mydb.selectCollection("xmatePost")
+#match_list = {"ssid":"8"}
+#ndata = {"time_range":{"time_start":moment.now().subtract(hours=12).epoch(), "time_end": moment.now().subtract(hours=6).epoch()}, "type":"Fucking", "member":[], "related_member":[], "owner":"", "ssid":"8"}
+#res = mydb.insertData(ndata)
+#print list(mydb.getData(match_list)["content"])[0]
+
 
 # for i in range(1,5):
 #     for j in range(2,6):

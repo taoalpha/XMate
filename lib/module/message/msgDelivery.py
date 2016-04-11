@@ -382,10 +382,10 @@ def updateConflict(post_list, mydb):
 
     for i in range(0,l-1):
         for j in range(i+1,l):
-            sti = cursor[i]["time_range"]["start_time"]
-            eni = cursor[i]["time_range"]["end_time"]
-            stj = cursor[j]["time_range"]["start_time"]
-            enj = cursor[j]["time_range"]["end_time"]
+            sti = cursor[i]["time_range"]["time_start"]
+            eni = cursor[i]["time_range"]["time_end"]
+            stj = cursor[j]["time_range"]["time_start"]
+            enj = cursor[j]["time_range"]["time_end"]
             if(max(sti,stj) < min(sti,stj)):
                 if(str(cursor[i]["_id"]) in rlist):
                     pass
@@ -438,8 +438,8 @@ def checkConflict(post_list, postid, conflict_list, mydb):
     et = 0
     for doc in cursor:
         if(str(doc["_id"]) == postid):
-            st = doc["time_range"]["start_time"]
-            et = doc["time_range"]["end_time"]
+            st = doc["time_range"]["time_start"]
+            et = doc["time_range"]["time_end"]
         else:
             pass
     flag = False
@@ -447,8 +447,8 @@ def checkConflict(post_list, postid, conflict_list, mydb):
         if(str(doc["_id"]) == postid):
             pass
         else:
-            mst = max(st, doc["time_range"]["start_time"])
-            met = min(et, doc["time_range"]["end_time"])
+            mst = max(st, doc["time_range"]["time_start"])
+            met = min(et, doc["time_range"]["time_end"])
             if(mst < met):
                 flag = True
                 if(str(doc["_id"]) in conflict_list):
