@@ -4,7 +4,7 @@ using System;
 namespace DataDefinition{
 
 	[AutoMarshalled]
-	public class userProfile{
+	public class profile{
 		// Public fields will be included in the outform representation, fields with internal
 		// keyword will not be included.
 		public int FacebookID;
@@ -30,12 +30,12 @@ namespace DataDefinition{
 		// TODO Unprocessed Message[ {Type:(Read but not processed/Unread),Message Id}, ]
 
 		// Null constructor: Needed for AutoMarshaller	
-		public userProfile(){
+		public profile(){
 			scheduleIndex = 0;
 			Console.WriteLine("Public intialization for user profile");
 		}
 
-		internal userProfile(int fbID, int ID, string name, scheduleUser[] schedules){
+		internal profile(int fbID, int ID, string name, scheduleUser[] schedules){
 			FacebookID = fbID;
 			id = ID;
 			username = name;
@@ -49,7 +49,7 @@ namespace DataDefinition{
 			return Vsync.Msg.toBArray(FacebookID, id,username, scheduleList);
 		}
 
-		public userProfile(byte[] ba){
+		public profile(byte[] ba){
 			object[] obs = Msg.BArrayToObjects(ba); 
 			int idx = 0;
 			FacebookID = (int)obs[idx++];
@@ -131,8 +131,8 @@ namespace DataDefinition{
 
 		public void initialize(){
 			Vsync.Msg.RegisterType(typeof(scheduleUser),scheduleUserTID);
-			Vsync.Msg.RegisterType(typeof(userProfile), profileTID);
-			Console.WriteLine("Registered userProfile and scheduleUser");			
+			Vsync.Msg.RegisterType(typeof(profile), profileTID);
+			Console.WriteLine("Registered profile and scheduleUser");			
 		}	
 	}
 }

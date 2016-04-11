@@ -2,7 +2,7 @@
 from System import Action
 import clr
 clr.AddReference('VsyncLib') # The profile of the dll file.
-clr.AddReference('selfDefinedDataType') # The profile of the dll file.
+clr.AddReference('DateTypes') # The profile of the dll file.
 import Vsync
 import DataDefinition
 #from Vsync import *
@@ -48,6 +48,7 @@ profile.ID = 321
 print "Here 4"
 profile.username = "User 1"
 profile.age = 20;
+profile.gender = "Male"
 profile.preferredGender = "Male"
 profile.city = "Ithaca"
 profile.latitude = 42.15
@@ -55,9 +56,9 @@ profile.longitude = 70.0
 profile.credits = 3
 profile.lastLoginTime = 20.2
 profile.height = 5.6
-profile.height = 120
+profile.weight = 120
 print "Here 5"
-# profile.addScheduleToList(12)
+profile.addScheduleToList(12)
 print "Here 6"
 g.Send(0, 17, profile)
 print "Here 7"
