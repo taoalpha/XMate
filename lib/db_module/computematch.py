@@ -120,6 +120,7 @@ def computeMatchUsers(uid, pid, mydb):
         for doc in cursor:
             for userid in doc["member"]:
                 recommend_user_list.add(userid)
+            recommend_user_list.add(doc["owner"])
 
     recommend_user_list = list(recommend_user_list)
     return returnHelper(content = recommend_user_list)
