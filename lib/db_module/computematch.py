@@ -47,7 +47,7 @@ def computeMatchPosts(uid, post_content, mydb):
     if(res["status"]):
         return res
     cursor = res["content"]
-    
+
     if(post_content["location"] == None):
         for doc in cursor:
             docu_list.append(doc)
@@ -110,7 +110,7 @@ def computeMatchUsers(uid, pid, mydb):
     history_events_list_objectid = []
     for doc in history_events_list:
         history_events_list_objectid.append(ObjectId(doc))
-    match_list = {{"_id": {"$in": history_events_list_objectid}},"type":post_type}
+    match_list = {"_id": {"$in": history_events_list_objectid},"type":post_type}
     res = mydb.getData(match_list)
     if(res["status"]):
         return res
