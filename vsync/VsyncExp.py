@@ -2,7 +2,7 @@
 from System import Action
 import clr
 clr.AddReference('VsyncLib') # The profile of the dll file.
-clr.AddReference('userDataType') # The profile of the dll file.
+clr.AddReference('selfDefinedDataType') # The profile of the dll file.
 import Vsync
 import DataDefinition
 #from Vsync import *
@@ -33,25 +33,35 @@ def myViewFunc(v):
 
 g = Vsync.Group('Experiment')
 
-g.RegisterHandler(0, Action[int, DataDefinition.userProfile](addUser))
+g.RegisterHandler(0, Action[int, DataDefinition.profile](addUser))
 g.RegisterHandler(1, Action[int](getProfile))
 g.RegisterViewHandler(Vsync.ViewHandler(myViewFunc))
-DataDefinition.initializer()
+DataDefinition.register()
 
 g.Join()
-print "Line 43"
+print "Here 1"
+profile = DataDefinition.profile()
+print "Here 2"
+profile.FacebookID = 123
+print "Here 3"
+profile.ID = 321
+print "Here 4"
+profile.username = "User 1"
+profile.age = 20;
+profile.preferredGender = "Male"
+profile.city = "Ithaca"
+profile.latitude = 42.15
+profile.longitude = 70.0
+profile.credits = 3
+profile.lastLoginTime = 20.2
+profile.height = 5.6
+profile.height = 120
+print "Here 5"
+# profile.addScheduleToList(12)
+print "Here 6"
+g.Send(0, 17, profile)
+print "Here 7"
 
-yihui = DataDefinition.userProfile()
-print "Line 46"
-yihui.FacebookID = 123
-print "Line 48"
-yihui.id = 321
-print "Line 50"
-yihui.username = "Yihui"
-# yihui = DataDefinition.userProfile([123,321,"Yihui"])
-print "Line 52"
-
-g.Send(0, 17, yihui)
 # g.Send(0, 15, jerry)
 res = []
 nr = g.Query(Vsync.Group.ALL, 1, 17, Vsync.EOLMarker(), res);
