@@ -20,17 +20,17 @@ def getData(request,res,db):
         Args:
             request: request with different data
             res: result that we need to update and return
-        Err:
-            1. invalid objectId
-            2. fail to get data
-            3. no match result
+        Err with status:
+            0. no match
+            1. normal
+            2. other err, see msg
     '''
     # error handler for invalid objectid
     if not ObjectId.is_valid(res["uid"]):
         #res["err"]["status"] = 1
         #res["err"]["msg"] = "wrong id"
         #return res
-        data = {"uid":int(res["uid"])}
+        data = {"fbid":int(res["uid"])}
     else:
         data = {"_id":ObjectId(res["uid"])}
 

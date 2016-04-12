@@ -47,5 +47,15 @@ def message(mid,action):
     db.selectCollection("xmateMessage")
     return jsonify(**messageDispatch(mid,action,request,db))
 
+# test for vsync connection
+@app.route('/rpc', defaults={'mid':None, 'action': None},methods=['GET', 'POST','PUT','DELETE'])
+@app.route('/rpc/<mid>', defaults={'action': None},methods=['DELETE','GET','POST','PUT'])
+@app.route('/rpc/<mid>/<action>',methods=['GET','POST','PUT'])
+def rpc(mid,action):
+    import xmlrpclib
+    s = xmlrpclib.ServerProxy('http://localhost:8000')
+    s.addUser(1,"fuck vysnc")
+    return jsonify({"hello":s.getProfile(1)})
+
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0')
