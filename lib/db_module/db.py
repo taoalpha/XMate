@@ -1,4 +1,42 @@
-import sys, pymongo
+'''
+res:
+    status:
+        0: no match
+        1: everything works normal
+        2: error in Vsync
+        3: invalid input
+    msg:
+        if status == 1, no msg else store_error_msg
+    content:
+        if status == 1, store real content
+
+for vsync:
+    getUserData( id )
+        if return -1, no match
+
+    postUserData( id, data_string )
+
+    removeUserData( id )
+
+    getScheduleData( id )
+        if return -1, no match
+
+    postScheduleData( id, data_string )
+
+    removeScheduleData( id )
+
+    getMessageData( id )
+        if return -1, no match
+
+    postMessageData( id, data_string )
+
+    removeMessageData( id )
+'''
+
+import sys
+import json
+import hashlib
+import xmlrpclib
 
 class CDatabase:
     '''
@@ -11,173 +49,168 @@ class CDatabase:
         Note all the return value is handled by return_helper() function
     '''
     def __init__(self):
-        self.client = None
-        self.db = None
-        self.collection = None
+        self.rpc = None
 
-    def buildConnection(self, url_name = 'mongodb://changsong:Lcs19921126@ds011298.mongolab.com:11298/lcs1992cs'):
-        '''
-            Desc:
-                build connection to database via the url name
-            Args:
-                url_name: the url of the database
-        '''
-
-        try:
-            self.client = pymongo.MongoClient(url_name,connect = True, serverSelectionTimeoutMS = 1000)
-            self.db = self.client.get_default_database()
-            return self.returnHelper()
-        except:
-            return self.returnHelper(1,"Failed to build the database connection")
-
-    def getStatus(self):
+    def buildConnection(self):
         '''
             Desc:
                 Get the server info to see whether the connection is failed
-                Build long-time connection to db
         '''
         try:
-            self.client.server_info()
-            return self.returnHelper()
+            self.rpc = xmlrpclib.ServerProxy('http://localhost:8000')
+            return self.returnHelper(1)
         except:
-            return self.returnHelper(1,"Connection lost")
+            return self.returnHelper(2,"Connection lost")
 
 
-    def selectCollection(self, coll_name):
+    def checkConnection(self):
         '''
             Desc:
-                Select collection by coll_name
-            Args:
-                coll_name: "xmateHistoryPost", "xmatePost", "xmateUser","xmateMessage"
+                check the connection
         '''
         try:
-            self.collection = self.db[coll_name]
+            system = self.rpc.system
             return self.returnHelper()
         except:
-            return self.returnHelper(1,"Failed to select connection")
+            return self.returnHelper(2,"Failed to connect to rpc server")
 
-    def closeConnection(self):
-        '''
-            Desc:
-                close connection to database via the url name
-        '''
-        try:
-            self.client.close()
-            return self.returnHelper()
-        except:
-            return self.returnHelper(1,"Failed to close the database connection")
-
-
-    def insertData(self,data):
+    def insertData(self,type,data):
         '''
             Desc:
                 insert one document into user collection
             Args:
-                data is a json type document
+                data is a list of json
                 type: user/schedule/message
             Ret:
                 return json:
                     res.inserted_id
                     res.content
         '''
+        content = {}
+        if data != "":
+            data_to_string = json.dumps(data)
+        data_to_string = data
         try:
-            res = self.collection.insert_one(data)
-            return self.returnHelper(content = res)
+            if type == "user":
+                self.rpc.postUserData(data["_id"],data_to_string)
+                return self.returnHelper(1, "", data)
+            elif type == "schedule":
+                id = hashlib.md5(data["type"]+data["creator"]+data["created_time"]).hexdigest()
+                self.rpc.postScheduleData(id,data_to_string)
+                return self.returnHelper(1, "", data)
+            elif type == "message":
+                id = hashlib.md5(data["sender_id"]+data["receiver_id"]+data["post_id"]).hexdigest()
+                self.rpc.postUserData(data["_id"],data_to_string)
+                return self.returnHelper(1, "", data)
+            else:
+                return self.returnHelper(3, "invalid type")
         except:
-            return self.returnHelper(1,"Failed to insert data")
+            return self.returnHelper(2,"Failed to insert data")
 
-    def insertManyData(self,data):
+    def insertManyData(self,type,data):
         '''
             Desc:
                 insert many documents into user collection
             Args:
-                data is json type documents
+                data is a list of json type documents
             Ret:
-                return res(object), res.inserted_id is the inserted document's id list
+                return
         '''
         try:
-            res = self.collection.insert_many(data)
-            return self.returnHelper(content = res)
+            for i in data:
+                self.insertData(type,i)
+            return self.returnHelper()
         except:
-            return self.returnHelper(1,"Failed to insert many data")
+            return self.returnHelper(2,"Failed to connect to the rpc server")
 
-    def getData(self, match_list):
+    def getData(self, type, id_list):
         '''
             Desc:
                 get documents by match_list
             Args:
-                match_list is a json type dict, {"key":value",...}
+                type: user/schedule/message
+                id_list: list of ids
             Ret:
                 return the matched documents list
         '''
+        content = []
         try:
-            cursor = self.collection.find(match_list)
-            return self.returnHelper(content = cursor)
+            if type == "user":
+                for i in id_list:
+                    content.append(json.loads(self.rpc.getUserData(i)))
+                return self.returnHelper(1, "", content)
+            elif type == "schedule":
+                for i in id_list:
+                    content.append(json.loads(self.rpc.getScheduleData(i)))
+                return self.returnHelper(1, "", content)
+            elif type == "message":
+                for i in id_list:
+                    content.append(json.loads(self.rpc.getMessageData(i)))
+                return self.returnHelper(1, "", content)
+            else:
+                return self.returnHelper(3, "invalid type")
         except:
-            return self.returnHelper(1,"Failed to get data")
+            return self.returnHelper(2,"Failed to insert data")
 
-
-    def updateData(self, match_list, data):
+    def updateData(self, type, id_list, data_list):
         '''
             Desc:
                 update documents by data via match_list constraint in user collection.
             Args:
-                match_list = {"key":"value",...}, data = {"key":"value",...}
-            Ret:
+                type: user/schedule/message
+                id_list: list of ids
+                data_list: list of json reprents the data I need to store into it.
+            Res:
                 # matched data by res.matched_count, # modified data by res.modified_count
         '''
+        length = len(id_list)
+        content = []
         try:
-            res = self.collection.update_many(match_list, {"$set":data})
-            return self.returnHelper(content = res)
+            for i in range(0,length):
+                res = self.insertData(type,id_list[i],data_list[i])
+                content.append(res["content"])
+            return self.returnHelper(1, "", content)
         except:
-            return self.returnHelper(1,"Failed to update data")
+            return self.returnHelper(2,"Failed to insert data")
 
-    def removeData(self, match_list):
+    def removeData(self, type, id_list):
         '''
             Desc:
-                remove documents by match_list constraint in user collection.
+                remove the item by setting the entry to empty string
             Args:
-                match_list = {"key":"value",...}
-            Ret:
-                # matched data by res.matched_count, # modified data by res.modified_count
+                type: user/schedule/message
+                id_list: list of id that need to be removed
+            Res:
+                return res
         '''
+        length = len(id_list)
+        content = []
         try:
-            res = self.collection.delete_many(match_list)
-            return self.returnHelper(content = res)
+            for i in range(0,length):
+                res = self.insertData(type,id_list[i],"")
+                content.append(res["content"])
+            return self.returnHelper(1, "", content)
         except:
-            return self.returnHelper(1,"Failed to remove data")
+            return self.returnHelper(2,"Failed to connect to rpc")
 
-    def returnHelper(self, status = 0, msg = None,content = None):
+    def returnHelper(self, status = 1, msg = None,content = None):
         '''
             Desc:
                 Handle all the other functions' return value
             Args:
-                status: 0 no error, 1 exception; msg: where the error occur
-                content: store the result; error: system error information
-            Ret:
-                # return correct content or error message
+                status:
+                    0: no match
+                    1: everything works normal
+                    2: error in Vsync
+                msg:
+                    if status == 1, no msg else store_error_msg
+                content:
+                    if status == 1, store real content
         '''
-        return_val = {}
-        return_val["status"] = status
-        return_val["msg"] = msg
-        return_val["error"] = sys.exc_info()
-        return_val["content"] = content
+        res = {}
+        res["status"] = status
+        res["msg"] = msg
+        res["error"] = sys.exc_info()
+        res["content"] = content
 
-        return return_val
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        return res
