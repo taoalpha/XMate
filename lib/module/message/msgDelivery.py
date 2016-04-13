@@ -1,10 +1,9 @@
 import sys, random, time, moment
 from datetime import datetime
-from bson.objectid import ObjectId
 # from db import CDatabase
 
 
-def returnHelper(status = 0, msg = None,content = None):
+def returnHelper(status = 1, msg = None,content = None):
     return_val = {}
     return_val["status"] = status
     return_val["msg"] = msg
@@ -13,7 +12,9 @@ def returnHelper(status = 0, msg = None,content = None):
     return return_val
 
 
+
 def createMsg(mtype, send_id, receive_id, post_id, content, mydb, create_time = None):
+    #create a new message and return its id
     msg = {}
     msg["type"] = mtype
     msg["post_id"] = post_id
@@ -21,93 +22,140 @@ def createMsg(mtype, send_id, receive_id, post_id, content, mydb, create_time = 
     msg["receiver_id"] = receive_id
     msg["content"] = content
     msg["create_time"] = moment.now().epoch()
-    msg_id = 0;
+    data_list = []
+    data_list.append(msg)
 
-    res = mydb.selectCollection("xmateMessage")
-    if(res["status"]):
+    res = mydb.insertData("message", data_list)
+    if(res["status"] != 1):
         return res
-    match_list = {"sender_id":send_id,"receiver_id":receive_id,"post_id":post_id}
-    res = mydb.getData(match_list)
-    if(res["status"]):
-        return res
-    cursor = list(res["content"])
 
-    if(len(cursor) > 0):
-        msg_id = cursor[0]["_id"]
-        res = mydb.updateData(match_list,{"create_time":msg["create_time"]})
-        if(res["status"]):
+    return returnHelper(content = res["content"])
+
+
+
+def insertMessage(uid, mid, mydb):
+    #update the user's unprocessed message list
+    id_list = []
+    data_list = []
+    id_list.append(uid)
+    res = mydb.getData("user",id_list)
+    if(res["status"] != 1):
+        return res
+    doc = res["content"][0]
+    if(mid not in doc["unprocessed_message"]):
+        doc["unprocessed_message"].append(mid)
+        data_list.append(doc)
+        res = mydb.updateData("user",id_list,data_list)
+        if(res["status"] != 1):
             return res
+
+    return returnHelper()
+
+
+def leavecheck(uid,pid,mydb):
+
+    #get the unprocessed message list from user
+    id_list = []
+    id_list.append(uid)
+    res = mydb.getData("user",id_list)
+    if(res["status"] != 1):
+        return res
+    doc = res["content"][0]
+    msg_list = doc["unprocessed_message"]
+    if(len(msg_list) == 0):
+        return returnHelper()
+
+    #check whether there are unprocessed message associated with the post
+    id_list = msg_list
+    res = mydb.getData("message",id_list)
+    if(res["status"] != 1):
+        return res
+    cursor = res["content"]
+    for doc in cursor:
+        if(doc["post_id"] == pid and doc["type"] == "join"):
+            return returnHelper(0, msg = "You should first processe the join request msgs associated with this post")
+
+    return returnHelper()
+
+
+
+def updateConflict(post_list, conflict_list, post_id, mydb):
+    #get the new conflict list of a user
+    if(post_id == None):
+        if(len(post_list) < 2):
+            return returnHelper(content = [])
+        id_list = post_list
+        res = mydb.getData("schedule",id_list)
+        if(res["status"] != 1):
+            return res
+        cursor = res["content"]
+        nconflict_list = set()
+        for i in range(0,len(cursor)-1):
+            for j in range(i+1,len(cursor)):
+                minen = min(cursor[i]["end_time"],cursor[j]["end_time"])
+                maxst = max(cursor[i]["start_time"],cursor[j]["start_time"])
+                if(minen > maxst):
+                    nconflict_list.add(cursor[i]["_id"])
+                    nconflict_list.add(cursor[j]["_id"])
+        
+        nconflict_list = list(nconflict_list)
+        return returnHelper(content = nconflict_list)
+
     else:
-        res = mydb.insertData(msg)
-        if(res["status"]):
+        if(len(post_list) == 0 or post_id in conflict_list):
+            return returnHelper(content = conflict_list)
+
+        id_list = post_list
+        id_list.append(post_id)
+        res = mydb.getData("schedule",id_list)
+        if(res["status"] != 1):
             return res
-        msg_id = res["content"].inserted_id
+        cursor = res["content"]
+        flag = False  
+        st = 0
+        en = 0
 
-    return returnHelper(content = msg_id)
+        for doc in cursor:
+            if(doc["_id"] == post_id):
+                st = doc["start_time"]
+                en = doc["end_time"]
+        for doc in cursor:
+            if(doc["_id"] != post_id):
+                minen = min(en, doc["end_time"])
+                maxst = max(st, doc["start_time"])
+                if(maxst < minen):
+                    flag = True
+                    if(doc["_id"] not in conflict_list):
+                        conflict_list.append(doc["_id"])
+        if(flag):
+            conflict_list.append(post_id)
+        nconflict_list = conflict_list
 
-
-
-
-def insertMessage(uid, msg_id, mydb):
-
-    res = mydb.selectCollection("xmateUser")
-    if(res["status"]):
-        return res
-    match_list = {"_id": ObjectId(uid)}
-    res = mydb.getData(match_list)
-    if(res["status"]):
-        return res
-    cursor = list(res["content"])
-
-    msg_list = cursor[0]["unprocessed_message"]
-    if(msg_id in msg_list):
-        pass
-    else:
-        msg_list.append(str(msg_id))
-        ndata = {"unprocessed_message":msg_list}
-        res = mydb.updateData(match_list, ndata)
-        if(res["status"]):
-            return res
-
-    return returnHelper(content = msg_id)
-
-
+        return returnHelper(content = nconflict_list)
 
 
 def sendJoin(uid, pid, mydb):
-
-    #to get the post owner's info
-    res = mydb.selectCollection("xmatePost")
-    if(res["status"]):
+    #get the post owner's info
+    id_list = []
+    id_list.append(pid)
+    res = mydb.getData("schedule",id_list)
+    if(res["status"] != 1):
         return res
-    match_list = {"_id":ObjectId(pid)}
-    res = mydb.getData(match_list)
-    if(res["status"]):
+    doc = res["content"][0]
+    owner_id = doc["owner"]
+    
+    #create a msg
+    id_list = []
+    id_list.append(uid)
+    res = mydb.getData("user",id_list)
+    if(res["status"] != 1):
         return res
-    cursor = list(res["content"])
-    ############################################################
-    if(len(cursor) == 0):
-        return returnHelper(1, msg = "The post has been deleted")
-
-    owner_id = cursor[0]["owner"]
-    post_type = cursor[0]["type"]
-
-    #create a msg and insert into database
-    sender_name = ""
-    res = mydb.selectCollection("xmateUser")
-    if(res["status"]):
+    user = res["content"][0]
+    sender_name = user["username"]
+    res = createMsg("join", uid, owner_id, pid,str(sender_name) + " want to join your post", mydb)
+    if(res["status"] != 1):
         return res
-    match_list = {"_id": ObjectId(uid)}
-    res = mydb.getData(match_list)
-    if(res["status"]):
-        return res
-    cursor = list(res["content"])
-    sender_name = cursor[0]["username"]
-
-    res = createMsg("join", uid, owner_id, pid, str(sender_name) + " want to join your " + str(post_type) + " activity", mydb)
-    if(res["status"]):
-        return res
-    msg_id = res["content"]
+    msg_id = res["content"][0]
 
     #update the info of receiver message list
     return insertMessage(owner_id, msg_id, mydb)
@@ -116,378 +164,223 @@ def sendJoin(uid, pid, mydb):
 
 def sendInvitation(uid, pid, rid, mydb):
     #create message
-    res = createMsg("invation", uid, rid, pid, "You are invited to join the post",mydb)
-    if(res["status"]):
+    res = createMsg("invation", uid, rid, pid, "You are invited to the post", mydb)
+    if(res["status"] != 1):
         return res
-    msg_id = res["content"]
+    msg_id = res["content"][0]
 
     return insertMessage(rid, msg_id, mydb)
 
 
 
 def declineRequest(uid, mid, mydb):
-    #get sender info from user ID
-    res = mydb.selectCollection("xmateMessage")
-    if(res["status"]):
+    #get sender info from message
+    id_list = []
+    id_list.append(mid)
+    res = mydb.getData("message",id_list)
+    if(res["status"] != 1):
         return res
-    match_list = {"_id":ObjectId(mid)}
-    res = mydb.getData(match_list)
-    if(res["status"]):
-        return res
-    cursor = list(res["content"])
-    msg_type = cursor[0]["type"]
-    post_id = cursor[0]["post_id"]
-    rid = cursor[0]["sender_id"]
-    content = ""
+    msg = res["content"][0]
+    
+    rid = msg["sender_id"]
+    msg_type = msg["type"]
+    post_id = msg["post_id"]
 
-    #Generate info by different type
-    if(msg_type == 'join'):
-        content = "You are declined to join post"
+    #generate message info by different type
+    content = ""
+    if(msg_type == "join"):
+        content = "You are declined to join the post"
     else:
-        res = mydb.selectCollection("xmatePost")
-        if(res["status"]):
+        id_list = []
+        id_list.append(post_id)
+        res = mydb.getData("schedule",id_list)
+        if(res["status"] != 1):
             return res
-        match_list = {"_id":ObjectId(post_id)}
-        res = mydb.getData(match_list)
-        if(res["status"]):
+        
+        id_list = []
+        id_list.append(uid)
+        res = mydb.getData("user",id_list)
+        if(res["status"] != 1):
             return res
-        cursor = list(res["content"])
-        if(len(cursor) == 0):
-            return finishReadMsg(uid, mid, mydb)
-        else:
-            res = mydb.selectCollection("xmateUser")
-            if(res["status"]):
-                return res
-            match_list = {"_id":ObjectId(uid)}
-            res = mydb.getData(match_list)
-            if(res["status"]):
-                return res
-            cursor = list(res["content"])
-            content = "Your invitation to "+ str(cursor[0]["username"])+" is declined"
+        user = res["content"][0]
+        content = "Your invitation to "+ user["username"] + " is declined"
 
     #Create plaintext message
     res = createMsg("plaintext", uid, rid, post_id, content, mydb)
-    if(res["status"]):
+    if(res["status"] != 1):
         return res
-    msg_id = res["content"]
+    msg_id = res["content"][0]
 
-    #update the sender's message list
+    #update the recevier's message list
     res = insertMessage(rid, msg_id, mydb)
-    if(res["status"]):
+    if(res["status"] != 1):
         return res
 
     return finishReadMsg(uid, mid, mydb)
-
-
-
 
 
 
 def acceptRequest(uid, mid, mydb):
     #get sender, receiver and post info from message
-    res = mydb.selectCollection("xmateMessage")
-    if(res["status"]):
+    id_list = []
+    id_list.append(mid)
+    res = mydb.getData("message",id_list)
+    if(res["status"] != 1):
         return res
-    match_list = {"_id":ObjectId(mid)}
-    res = mydb.getData(match_list)
-    if(res["status"]):
+    msg = res["content"][0]
+    post_id = msg["post_id"]
+    sid = msg["sender_id"]
+    rid = msg["receiver_id"]
+    msg_type = msg["type"]
+
+    #add the user to the post member_list(update)
+    id_list = []
+    id_list.append(post_id)
+    res = mydb.getData("schedule",id_list)
+    if(res["status"] != 1):
         return res
-    cursor = list(res["content"])
-
-    msg_type = cursor[0]["type"]
-    sid = cursor[0]["sender_id"]
-    rid = cursor[0]["receiver_id"]
-    post_id = cursor[0]["post_id"]
-
-
-    #add the user to the post member_list
-    res = mydb.selectCollection("xmatePost")
-    if(res["status"]):
-        return res
-    match_list = {"_id":ObjectId(post_id)}
-    res = mydb.getData(match_list)
-    if(res["status"]):
-        return res
-    cursor = list(res["content"])
-    ##################################################################
-    if(len(cursor) == 0):
-        return returnHelper(1, msg = "The post has been deleted")
-
-    userid = ""
+    doc = res["content"][0]
+    user_id = ""
     if(msg_type == "join"):
-        userid = sid
+        user_id = sid 
     else:
-        userid = rid
-
-    mem_list = cursor[0]["member"]
-    if(userid in mem_list):
+        user_id = rid
+    if(user_id in doc["member"]):
         pass
     else:
-        mem_list.append(userid)
-        ndata = {"member":mem_list}
-        res = mydb.updateData(match_list,ndata)
-        if(res["status"]):
+        doc["member"].append(user_id) 
+        data_list = []
+        data_list.append(doc)
+        res = mydb.updateData("schedule",id_list,data_list)
+        if(res["status"] != 1):
             return res
 
     #add the post to the user's post list
-    res = mydb.selectCollection("xmateUser")
-    if(res["status"]):
+    id_list = []
+    id_list.append(user_id)
+    res = mydb.getData("user",id_list)
+    if(res["status"] != 1):
         return res
-    match_list = {"_id":ObjectId(userid)}
-    res = mydb.getData(match_list)
-    if(res["status"]):
-        return res
-    cursor = list(res["content"])
-
-    post_list = cursor[0]["schedule_list"]
-    conflict_list = cursor[0]["conflict_list"]
-    if(str(post_id) in post_list):
+    user = res["content"][0]
+    if(post_id in user["schedule_list"]):
         pass
     else:
-        res = checkConflict(post_list, post_id, conflict_list, mydb)
-        if(res["status"]):
+        res = updateConflict(user["schedule_list"], user["conflict_list"],post_id, mydb)
+        if(res["status"] != 1):
             return res
-        post_list.append(str(post_id))
-
-        res = mydb.selectCollection("xmateUser")
-        if(res["status"]):
-            return res
-        ndata = {"schedule_list":post_list, "conflict_list":conflict_list}
-        res = mydb.updateData(match_list, ndata)
-        if(res["status"]):
+        user["conflict_list"] = res["content"]
+        user["schedule_list"].append(post_id)
+        data_list = []
+        data_list.append(user)
+        res = mydb.updateData("user",id_list,data_list)
+        if(res["status"] != 1):
             return res
 
     return finishReadMsg(uid, mid, mydb)
 
 
-
 def leavePost(uid, pid, mydb):
-    #get owner info
-    res = mydb.selectCollection("xmatePost")
-    if(res["status"]):
+    
+    #get owner id from pid
+    id_list = []
+    id_list.append(pid)
+    res = mydb.getData("schedule",id_list)
+    if(res["status"] != 1):
         return res
-    match_list = {"_id":ObjectId(pid)}
-    res = mydb.getData(match_list)
-    if(res["status"]):
-        return res
-    cursor = list(res["content"])
-    owner_id = cursor[0]["owner"]
-    mem_list = cursor[0]["member"]
+    doc = res["content"][0]
 
     deletePost = False
-
-    if(uid == owner_id):
+    if(uid == doc["owner"]):
         res = leavecheck(uid,pid,mydb)
-        if(res["status"]):
+        if(res["status"] != 1):
             return res
-        if(len(mem_list) > 0):
-            new_owner_id = random.choice(mem_list)
-            mem_list.remove(new_owner_id)
-            res = mydb.selectCollection("xmatePost")
-            if(res["status"]):
-                return res
-            match_list = {"_id":ObjectId(pid)}
-            ndata = {"owner":new_owner_id, "member":mem_list}
-            res = mydb.updateData(match_list,ndata)
-            if(res["status"]):
+        if(len(doc["member"]) > 0):
+            new_owner = random.choice(doc["member"])
+            doc["member"].remove(new_owner)
+            doc["owner"] = new_owner
+            data_list = []
+            data_list.append(doc)
+            res = mydb.updateData("schedule",id_list,data_list)
+            if(res["status"] != 1):
                 return res
 
-            res = mydb.selectCollection("xmateMessage")
-            if(res["status"]):
+            res = createMsg("plaintext", uid, new_owner, pid,"You become the owner of the Post",mydb)
+            if(res["status"] != 1):
                 return res
-            res = createMsg("plaintext",owner_id,new_owner_id,pid,"You become the owner of the Post",mydb)
-            if(res["status"]):
-                return res
-            msg_id = res["content"]
-            #update the sender's message list
-            res = insertMessage(new_owner_id, msg_id, mydb)
-            if(res["status"]):
-                return res
+            msg_id = res["content"][0]
+            res = insertMessage(new_owner, msg_id, mydb)
         else:
             deletePost = True
     else:
-        if(uid in mem_list):
-            mem_list.remove(uid)
-            ndata = {"member":mem_list}
-            res = mydb.updateData(match_list,ndata)
-            if(res["status"]):
+        if(uid in doc["member"]):
+            doc["member"].remove(uid)
+            data_list = []
+            data_list.append(doc)
+            res = mydb.updateData("schedule",id_list,data_list)
+            if(res["status"] != 1):
                 return res
 
+            res = createMsg("plaintext", uid, doc["owner"], pid,"Someone leaves your post",mydb)
+            if(res["status"] != 1):
+                return res
+            msg_id = res["content"][0]
+            res = insertMessage(doc["owner"], msg_id, mydb)
+
+
     #delete post in the user's post list
-    res = mydb.selectCollection("xmateUser")
-    if(res["status"]):
+    id_list = []
+    id_list.append(uid)
+    res = mydb.getData("user",id_list)
+    if(res["status"] != 1):
         return res
-    match_list = {"_id":ObjectId(uid)}
-    res = mydb.getData(match_list)
-    if(res["status"]):
+    user = res["content"][0]
+    if(pid in user["schedule_list"]):
+        user["schedule_list"].remove(pid)
+
+    res = updateConflict(user["schedule_list"], user["conflict_list"], None, mydb)
+    if(res["status"] != 1):
         return res
-    cursor = list(res["content"])
-    post_list = cursor[0]["schedule_list"]
-    conflict_list = cursor[0]["conflict_list"]
-
-
-    if(pid in post_list):
-        post_list.remove(pid)
-        ndata = {"schedule_list":post_list}
-        res = mydb.updateData(match_list,ndata)
-        if(res["status"]):
-            return res
-
-    res = updateConflict(post_list,mydb)
-    if(res["status"]):
+    user["conflict_list"] = res["content"]
+    data_list = []
+    data_list.append(user)
+    res = mydb.update("user",id_list,data_list)
+    if(res["status"] != 1):
         return res
-    nconflict_list = res["content"]
-    if(pid in conflict_list):
-        conflict_list.remove(pid)
-    if(nconflict_list == conflict_list):
-        pass
-    else:
-        res = mydb.selectCollection("xmateUser")
-        if(res["status"]):
-            return res
-        match_list = {"_id":ObjectId(uid)}
-        ndata = {"conflict_list":nconflict_list}
-        res = mydb.updateData(match_list,ndata)
-        if(res["status"]):
-            return res
 
     if(deletePost):
-        res = mydb.selectCollection("xmatePost")
-        if(res["status"]):
-            return res
-        match_list = {"_id": ObjectId(pid)}
-        res = mydb.removeData(match_list)
-        if(res["status"]):
+        id_list = []
+        id_list.append(pid)
+        res = mydb.removeData("schedule",id_list)
+        if(res["status"] != 1):
             return res
 
     return returnHelper()
 
 
-
-def updateConflict(post_list, mydb):
-
-    rlist = []
-    res = mydb.selectCollection("xmatePost")
-    if(res["status"]):
-        return res
-    post_list_object = []
-    for i in post_list:
-        post_list_object.append(ObjectId(i))
-    match_list = {"_id": {"$in": post_list_object}}
-    res = mydb.getData(match_list)
-    if(res["status"]):
-        return res
-    cursor = list(res["content"])
-    l = len(cursor)
-
-    for i in range(0,l-1):
-        for j in range(i+1,l):
-            sti = cursor[i]["time_range"]["time_start"]
-            eni = cursor[i]["time_range"]["time_end"]
-            stj = cursor[j]["time_range"]["time_start"]
-            enj = cursor[j]["time_range"]["time_end"]
-            if(max(sti,stj) < min(sti,stj)):
-                if(str(cursor[i]["_id"]) in rlist):
-                    pass
-                else:
-                    rlist.append(str(cursor[i]["_id"]))
-                if(str(cursor[j]["_id"]) in rlist):
-                    pass
-                else:
-                    rlist.append(str(cursor[j]["_id"]))
-
-    return returnHelper(content = rlist)
-
-
-
-
-def leavecheck(uid,pid,mydb):
-
-    res = mydb.selectCollection("xmateMessage")
-    if(res["status"]):
-        return res
-    match_list = {"receiver_id":uid,"post_id":pid}
-    res = mydb.getData(match_list)
-    if(res["status"]):
-        return res
-    cursor = list(res["content"])
-    if(len(cursor) > 0):
-        return returnHelper(1,"You should first processe the join requests message associated with this post")
-
-    return returnHelper()
-
-
-
-def checkConflict(post_list, postid, conflict_list, mydb):
-    if(len(post_list) == 0 or postid in conflict_list):
-        return returnHelper()
-
-    res = mydb.selectCollection("xmatePost")
-    if(res["status"]):
-        return res
-    post_list.append(postid)
-    post_list_object = []
-    for i in post_list:
-        post_list_object.append(ObjectId(i))
-    match_list = {"_id": {"$in": post_list_object}}
-    res = mydb.getData(match_list)
-    if(res["status"]):
-        return res
-    cursor = list(res["content"])
-    st = 0
-    et = 0
-    for doc in cursor:
-        if(str(doc["_id"]) == postid):
-            st = doc["time_range"]["time_start"]
-            et = doc["time_range"]["time_end"]
-        else:
-            pass
-    flag = False
-    for doc in cursor:
-        if(str(doc["_id"]) == postid):
-            pass
-        else:
-            mst = max(st, doc["time_range"]["time_start"])
-            met = min(et, doc["time_range"]["time_end"])
-            if(mst < met):
-                flag = True
-                if(str(doc["_id"]) in conflict_list):
-                    pass
-                else:
-                    conflict_list.append(str(doc["_id"]))
-    if(flag):
-        conflict_list.append(postid)
-
-    return returnHelper()
-
-
-
-##########################remind Tao to delete for plaintext
+######remind Tao to delete for plaintext
 def finishReadMsg(uid, mid, mydb):
-    #remove the message from the user unprocessed list
-    res = mydb.selectCollection("xmateUser")
-    if(res["status"]):
+    
+    #update the user unprocessed list by removing the message
+    id_list = []
+    data_list = []
+    id_list.append(uid)
+    res = mydb.getData("user",uid)
+    if(res["status"] != 1):
         return res
-    match_list = {"_id":ObjectId(uid)}
-    res = mydb.getData(match_list)
-    if(res["status"]):
-        return res
-    cursor = list(res["content"])
-    msg_list = cursor[0]["unprocessed_message"]
-    if(mid in msg_list):
-        msg_list.remove(mid)
-        ndata = {"unprocessed_message":msg_list}
-        res = mydb.updateData(match_list, ndata)
-        if(res["status"]):
+    doc = res["content"][0]
+    if(mid in doc["unprocessed_message"]):
+        doc["unprocessed_message"].remove(mid)
+        data_list.append(doc)
+        res = mydb.updateData("user",id_list,data_list)
+        if(res["status"] != 1):
             return res
+
 
     #remove the message from database
-    res = mydb.selectCollection("xmateMessage")
-    if(res["status"]):
-        return res
-    match_list = {"_id":ObjectId(mid)}
-    res = mydb.removeData(match_list)
-    if(res["status"]):
+    id_list = []
+    id_list.append(mid)
+    res = mydb.removeData("message",id_list)
+    if(res["status"] != 1):
         return res
 
     return returnHelper()
@@ -496,68 +389,55 @@ def finishReadMsg(uid, mid, mydb):
 
 def checkMsg(mydb):
 
-    res = mydb.selectCollection("xmateMessage")
-    if(res["status"]):
+    #get all messages and check the out of time message
+    id_list = []
+    res = mydb.getData("message", id_list)
+    if(res["status"] != 1):
         return res
+    cursor = res["content"]
 
-    #find out of date messages(more than 24hr)
+    outoftime_msg = []
+    related_user = {}
     current_time = moment.now().epoch()
     st = current_time - 86400
-    print st
-    match_list = {"create_time":{"$lt":st}}
-    res = mydb.getData(match_list)
-    if(res["status"]):
-        return res
-    cursor = list(res["content"])
-    #delete out of date msg_ids in users' unprocessed msg list
-    user_msg = {}
-    outoftime_msg = []
-    related_userlist = set()
-
-    if(len(cursor) == 0):
-        return returnHelper()
     for msg in cursor:
-        outoftime_msg.append(msg["_id"])
-        related_userlist.add(ObjectId(msg["receiver_id"]))
-        if(ObjectId(msg["receiver_id"]) in user_msg.keys()):
-            pass
-        else:
-            user_msg[ObjectId(msg["receiver_id"])] = []
-        user_msg[ObjectId(msg["receiver_id"])].append(msg["_id"])
-    related_userlist = list(related_userlist)
+        if(msg["create_time"] < st):
+            outoftime_msg.append(doc["_id"])
+            if(msg["receiver_id"] in related_user.keys()):
+                pass
+            else:
+                related_user[msg["receiver_id"]] = []
+            related_user[msg["receiver_id"]].append(msg["_id"])
+    if(len(outoftime_msg) == 0):
+        return returnHelper() 
 
-    res = mydb.selectCollection("xmateUser")
-    if(res["status"]):
+    #update users' unprocessed msg list by removing the out of date msgs
+    id_list = related_user.keys()
+    res = mydb.getData("user",id_list)
+    if(res["status"] != 1):
         return res
-    match_list = {"_id": {"$in": related_userlist}}
-    res = mydb.getData(match_list)
-    if(res["status"]):
+    cursor = res["content"]
+
+    id_list = []
+    data_list = []  
+    for user in cursor:
+        for msg_id in related_user[user["_id"]]:
+            if(msg_id in user["unprocessed_message"]):
+                user["unprocessed_message"].remove(msg_id)
+        id_list.append(user["_id"])
+        data_list.append(user)
+    res = mydb.updateData("user",id_list, data_list)
+    if(res["status"] != 1):
         return res
-    cursor =  res["content"]
 
-    for users in cursor:
-        uid = users["_id"]
-        nlist = users["unprocessed_message"]
-        for mid in user_msg[uid]:
-            if(mid in nlist):
-                nlist.remove(mid)
 
-        match_list = {"_id":uid}
-        ndata = {"unprocessed_message":nlist}
-        res = mydb.updateData(match_list,ndata)
-        if(res["status"]):
-            return res
-
-    print outoftime_msg
-    #delete the messages in database
-    res = mydb.selectCollection("xmateMessage")
-    if(res["status"]):
-        return res
-    match_list = {"_id": {"$in": outoftime_msg}}
-    res = mydb.removeData(match_list)
-    if(res["status"]):
+    #delete the out of time messages in database
+    id_list = outoftime_msg
+    res = mydb.removeData("message", id_list)
+    if(res["status"] != 1):
         return res
 
     return returnHelper()
+
 
 
