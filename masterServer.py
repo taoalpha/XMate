@@ -23,13 +23,13 @@ users = {}
 
 
 def addUser(id, profile):
-	self.users[id] = profile
+	users[id] = profile
 	print("Vsync server addUser with id=" + id)
 server.register_function(addUser,'addUser')
 
 def getProfile(id):
 	print("Vsync get profile with id=" + id)
-	self.group.Reply(self.users[id])
+	group.Reply(users[id])
 server.register_function(getProfile,'getProfile')
 
 def myViewFunc(v):
@@ -40,12 +40,12 @@ def myViewFunc(v):
     for a in v.leavers:
         print('  Leaving: ' + a.ToString() + ', isMyAddress='+a.isMyAddress().ToString())
     return
+server.register_function(myViewFunc,'myViewFunc')
 
-g.RegisterHandler(0, Action[int, str](addUser))
-g.RegisterHandler(1, Action[int](getProfile))
-g.RegisterViewHandler(Vsync.ViewHandler(myViewFunc))
+group.RegisterHandler(0, Action[int, str](addUser))
+group.RegisterHandler(1, Action[int](getProfile))
+group.RegisterViewHandler(Vsync.ViewHandler(myViewFunc))
 
-
-server.serve_forever()
 
 Vsync.VsyncSystem.WaitForever()
+server.serve_forever()
