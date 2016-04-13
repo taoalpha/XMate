@@ -1,6 +1,4 @@
 #!/usr/bin/python
-from bson.objectid import ObjectId
-
 # define all combination of attributes contained in each field
 FIELDS = {
     "profile": ["username","age","gender","preferred","address"],
@@ -25,51 +23,12 @@ def getData(request,res,db):
             1. normal
             2. other err, see msg
     '''
-    # error handler for invalid objectid
-    if not ObjectId.is_valid(res["uid"]):
-        #res["err"]["status"] = 1
-        #res["err"]["msg"] = "wrong id"
-        #return res
-        data = {"fbid":int(res["uid"])}
-    else:
-        data = {"_id":ObjectId(res["uid"])}
+    data = [res["_id"]]
 
-    # data = {"sid":{"$in":schedule_list}}
-    # get the data based on uid
-    # docs:
-    #   status: success or not
-    #   content: cursor contains the result
-    docs = db.getData(data)
+    docs = db.getData(type,data)
 
     # error handler for getting data
-    # return early
-    if docs["status"]:
-        res["err"] = docs
-        return res
-
-    # error handler for no match result
-    # return early
-    if docs["content"].count() == 0:
-        res["err"]["status"] = 1
-        res["err"]["msg"] = "no matches"
-        return res
-
-    #
-    # normal process
-    #
-    for doc in docs["content"]:
-        #for i,key in enumerate(FIELDS["DELETE"]):
-            # remove all non-neccessary fields
-        # convert objectId to string for jsonify
-        doc["_id"] = str(doc["_id"])
-
-        # just in case we have multiple matches (should not happen for uid search)
-        if docs["content"].count() > 1:
-            res["rawdata"]["entries"] = []
-            res["rawdata"]["entries"].append(doc)
-        else:
-            res["rawdata"] = doc
-    return res
+    return docs
 
 # define the filterData function
 def filterData(request,res):
