@@ -24,9 +24,8 @@ def hello_world():
 @app.route('/user/<uid>/<action>')
 def user(uid,action):
     status = db.getStatus()
-    if status["status"] == 1:
+    if status["status"] != 1:
         db.buildConnection()
-    db.selectCollection("xmateUser")
     #return jsonify(**userDispatch(uid,action,request,db))
     #return json.dumps(userDispatch(uid,action,request,db))
     return json.dumps(userDispatch(uid,action,request,db))
@@ -36,7 +35,9 @@ def user(uid,action):
 @app.route('/schedule/<sid>', defaults={'action': None},methods=['GET', 'PUT', 'DELETE'])
 @app.route('/schedule/<sid>/<action>')
 def schedule(sid,action):
-    db.selectCollection("xmatePost")
+    status = db.getStatus()
+    if status["status"] != 1:
+        db.buildConnection()
     #db.selectCollection("xmateHistoryPost")
     return jsonify(**scheduleDispatch(sid,action,request,db))
 
@@ -44,7 +45,7 @@ def schedule(sid,action):
 @app.route('/message/<mid>', defaults={'action': None},methods=['DELETE','GET','POST','PUT'])
 @app.route('/message/<mid>/<action>',methods=['GET','POST','PUT'])
 def message(mid,action):
-    db.selectCollection("xmateMessage")
+    print request.method
     return jsonify(**messageDispatch(mid,action,request,db))
 
 # test for vsync connection

@@ -1,56 +1,8 @@
 #!/usr/bin/python
 
 # Dispatch function for user api
-from ...db_module import computematch as CM
+from ..db_module import computematch as CM
 
-FIELDS = {
-    "_id":"",
-    "type":"",
-    "latitude":"",
-    "longitude":"",
-    "start_time":"",
-    "end_time":"",
-    "post_time":"",
-    "owner":"", 
-    "member":[]
-}
-# define dispatch dictionary
-DISPATCH = {
-    "GET": getData,
-    "POST": postData,
-    "PUT": putData,
-    "DELETE": delData,
-}
-
-def scheduleDispatch(sid,field,request,db):
-    '''
-        Desc:
-            schedule dispatch based on different http request methods
-        Args:
-            sid: schedule id
-            field: search or match, to get the search result or match result of a specific schedule
-
-    '''
-    res = {}
-    res["field"] = field
-    res["sid"] = sid
-    # store any possible err msg
-    res["status"] = 1
-
-    # content stores all validate information
-    res["content"] = {}
-    if request.method == "DELETE":
-        res["status"] = 4
-        res["msg"] = "Forbidden operation"
-        return res
-
-    # dispatch with method
-    DISPATCH[request.method](request,res,db)
-
-    # return early if there is any err
-    if (res["status"] != 1):
-        return res
-    return res
 def delData(request,res,db):
     '''
         Desc:
@@ -155,4 +107,54 @@ def getData(request,res,db):
 
 
 
+
+
+FIELDS = {
+    "_id":"",
+    "type":"",
+    "latitude":"",
+    "longitude":"",
+    "start_time":"",
+    "end_time":"",
+    "post_time":"",
+    "owner":"", 
+    "member":[]
+}
+# define dispatch dictionary
+DISPATCH = {
+    "GET": getData,
+    "POST": postData,
+    "PUT": putData,
+    "DELETE": delData,
+}
+
+def scheduleDispatch(sid,field,request,db):
+    '''
+        Desc:
+            schedule dispatch based on different http request methods
+        Args:
+            sid: schedule id
+            field: search or match, to get the search result or match result of a specific schedule
+
+    '''
+    res = {}
+    res["field"] = field
+    res["sid"] = sid
+    # store any possible err msg
+    res["status"] = 1
+
+    # content stores all validate information
+    res["content"] = {}
+    if request.method == "DELETE":
+        res["status"] = 4
+        res["msg"] = "Forbidden operation"
+        return res
+
+    # dispatch with method
+    res = DISPATCH[request.method](request,res,db)
+
+    # return early if there is any err
+    if (res["status"] != 1):
+        return res
+    return res["content"][0]
 

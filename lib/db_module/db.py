@@ -63,7 +63,7 @@ class CDatabase:
             return self.returnHelper(2,"Connection lost")
 
 
-    def checkConnection(self):
+    def getStatus(self):
         '''
             Desc:
                 check the connection
@@ -74,7 +74,7 @@ class CDatabase:
         except:
             return self.returnHelper(2,"Failed to connect to rpc server")
 
-    def insertData(self,type,data):
+    def insertData(self,type,datas):
         '''
             Desc:
                 insert one document into user collection
@@ -86,26 +86,32 @@ class CDatabase:
                     res.inserted_id
                     res.content
         '''
-        content = {}
-        if data != "":
-            data_to_string = json.dumps(data)
-        data_to_string = data
+        content = []
         try:
-            if type == "user":
-                self.rpc.postUserData(data["_id"],data_to_string)
-                return self.returnHelper(1, "", data)
-            elif type == "schedule":
-                id = hashlib.md5(data["type"]+data["creator"]+data["created_time"]).hexdigest()
-                self.rpc.postScheduleData(id,data_to_string)
-                return self.returnHelper(1, "", data)
-            elif type == "message":
-                id = hashlib.md5(data["sender_id"]+data["receiver_id"]+data["post_id"]).hexdigest()
-                self.rpc.postUserData(data["_id"],data_to_string)
-                return self.returnHelper(1, "", data)
-            else:
-                return self.returnHelper(3, "invalid type")
+            for data in datas:
+                if data != "":
+                    data_to_string = json.dumps(data)
+                else:
+                    data_to_string = data
+                if type == "user":
+                    self.rpc.postUserData(data["_id"],data_to_string)
+                    content.append(data)
+                elif type == "schedule":
+                    id = hashlib.md5(data["type"]+data["creator"]+data["created_time"]).hexdigest()
+                    self.rpc.postScheduleData(id,data_to_string)
+                    data["_id"] = id
+                    content.append(data)
+                elif type == "message":
+                    id = hashlib.md5(data["sender_id"]+data["receiver_id"]+data["post_id"]).hexdigest()
+                    self.rpc.postMessageData(id,data_to_string)
+                    data["_id"] = id
+                    print data
+                    content.append(data)
+                else:
+                    return self.returnHelper(3, "invalid type")
+            return self.returnHelper(1, "", content)
         except:
-            return self.returnHelper(2,"Failed to insert data")
+            return self.returnHelper(2,"fail to connect")
 
     def insertManyData(self,type,data):
         '''
@@ -150,7 +156,7 @@ class CDatabase:
             else:
                 return self.returnHelper(3, "invalid type")
         except:
-            return self.returnHelper(2,"Failed to insert data")
+            return self.returnHelper(2,"Failed to get from rpc")
 
     def updateData(self, type, id_list, data_list):
         '''

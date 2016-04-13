@@ -62,8 +62,9 @@ def messageDispatch(mid,action,request,db):
                 res["content"] = {"_id":tempRes["content"]}
                 return res["content"]
         elif res["action"] == "invite":
-            tempRes = msgDelivery.sendInvitation(request.form["sender"], request.form["post"], request.form["receiver"], db)
-            if tempRes["status"] == 1:
+            tempRes = msgDelivery.sendInvitation(request.form["sender_id"], request.form["post_id"], request.form["receiver_id"], db)
+	    print tempRes
+            if tempRes["status"] != 1:
                 # some errors happen
                 res["err"]["status"] = 1
                 res["err"]["msg"] = tempRes["msg"]
