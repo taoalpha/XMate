@@ -24,7 +24,8 @@ schedules = {}
 messages = {}
 
 
-### User DHT
+""" User DHT
+"""
 def postUserData_api(id, profile):
 	"""add a profile with id to the users DHT.
 		id and profile are both string.
@@ -39,7 +40,7 @@ def postUserData(id, profile):
 
 def getUserData_api(id):
 	"""get a user profile from the user DHT with the given id.
-		id is a string, and the functions return a string.
+		id is a string, and the functions return a string unless no macthing found.
 	"""
 	res = []
 	print(res)
@@ -67,10 +68,11 @@ def removeUserData(id):
 	print("Vsync server removeUserData with id=" + id.ToString())
 
 
-### Message DHT
+""" Message DHT
+"""
 def postMessageData_api(id, message):
 	"""add a message with id to the message DHT.
-		id and message are both string
+		id and message are both string.
 	"""
 	group.Send(3, id, message)
 	return "message" # just for flask
@@ -81,6 +83,9 @@ def postMessageData(id, message):
 	print("Vsync server postMessageData with id=" + id.ToString())
 
 def getMessageData_api(id):
+	"""get a message from the message DHT with the given id.
+		id is a string, and the functions return a string unless no macthing found.
+	"""
 	res = []
 	nr = group.Query(Vsync.Group.ALL, 4, id, Vsync.EOLMarker(), res)
 	for ele in res:
@@ -94,6 +99,9 @@ def getMessageData(id):
 	print("Vsync server getMessageData with id=" + id.ToString())
 
 def removeMessageData_api(id):
+	"""set a message to be "" in the message DHT with the given id.
+		id is a string.
+	"""
 	group.Send(5, id)
 	return "message" # just for flask
 server.register_function(removeMessageData_api,'removeMessageData')
@@ -102,8 +110,12 @@ def removeMessageData(id):
 	messages[id] = ""
 	print("Vsync server removeMessageData with id=" + id.ToString())
 
-### Schedule DHT
+""" Schedule DHT 
+"""
 def postScheduleData_api(id, schedule):
+	"""add a schedule with id to the schedule DHT.
+		id and schedule are both string
+	"""
 	group.Send(6, id, schedule)
 	return "schedule" # just for flask
 server.register_function(postScheduleData_api,'postScheduleData')
@@ -113,6 +125,9 @@ def postScheduleData(id, schedule):
 	print("Vsync server postScheduleData with id=" + id.ToString())
 
 def getScheduleData_api(id):
+	"""get a schedule from the schedule DHT with the given id.
+		id is a string, and the functions return a string unless no macthing found.
+	"""
 	res = []
 	nr = group.Query(Vsync.Group.ALL, 7, id, Vsync.EOLMarker(), res)
 	for ele in res:
@@ -126,6 +141,9 @@ def getScheduleData(id):
 	print("Vsync server getScheduleData with id=" + id.ToString())
 
 def removeScheduleData_api(id):
+	"""set a schedule to be "" in the schedule DHT with the given id.
+		id is a string.
+	"""
 	group.Send(8, id)
 	return "profile"
 server.register_function(removeScheduleData_api,'removeScheduleData')
