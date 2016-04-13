@@ -12,22 +12,32 @@ def postData(request,res,db):
         Return:
             uid: ObjectId
     '''
-
+    FIELDS = {
+            "_id" : "",
+            "username" : "",
+            "age" : "",
+            "gender" : "",
+            "preferred_gender" : "",
+            "city": "",
+            "credits" : "",
+            "latitude" : "",
+            "longitude" : "",
+            "last_time_login" : "",
+            "height" : "",
+            "weight" : "",
+            "schedule_list" : [],
+            "conflict_list" : [],
+            "history_partner" : [],
+            "history_events" : [],
+            "unprocessed_message" : [],
+    }
     # store requested form
-    data = {}
+    data = FIELDS
     for key in request.form:
         data[key] = request.form[key]
 
     # convert uid to int, can be deleted later(we don't need uid, use ObjectId instead)
-    docs = db.insertData(data)
-
-    # store the return from inserting into res
-    res["err"] = docs
+    res = db.insertData("user",[data])
 
     # deal with inserting error
-    if docs["status"] == 1:
-        return res
-
-    # store the ObjectId to _id
-    res["content"]["_id"] = str(docs["content"].inserted_id)
     return res

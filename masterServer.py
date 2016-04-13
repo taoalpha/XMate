@@ -3,7 +3,7 @@ import clr
 clr.AddReference('VsyncLib') # The profile of the dll file.
 import Vsync
 
-#from threading import Thread
+from threading import Thread
 
 Vsync.VsyncSystem.Start()
 
@@ -183,4 +183,4 @@ group.Join()
 
 ### run
 server.serve_forever()
-Vsync.VsyncSystem.WaitForever()
+vsync.VsyncSystem.WaitForever()
