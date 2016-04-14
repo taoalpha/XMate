@@ -48,11 +48,14 @@ def getUserData_api(id):
 	for ele in res:
 		if (ele != -1):
 			return ele
-	return -1
+	return "-1"
 server.register_function(getUserData_api, 'getUserData')
 
 def getUserData(id):
-	group.Reply(users[id])
+	if id in users:
+		group.Reply(users[id])
+	else:
+		group.Reply(-1)
 	print("Vsync server getUserData with id=" + id.ToString())
 
 def removeUserData_api(id):
@@ -91,11 +94,14 @@ def getMessageData_api(id):
 	for ele in res:
 		if (ele != -1):
 			return ele
-	return -1
+	return "-1"
 server.register_function(getMessageData_api,'getMessageData')
 
 def getMessageData(id):
-	group.Reply(messages[id])
+	if id in messages:
+		group.Reply(messages[id])
+	else:
+		group.Reply(-1)
 	print("Vsync server getMessageData with id=" + id.ToString())
 
 def removeMessageData_api(id):
@@ -133,11 +139,14 @@ def getScheduleData_api(id):
 	for ele in res:
 		if (ele != -1):
 			return ele
-	return -1
+	return "-1"
 server.register_function(getScheduleData_api,'getScheduleData')
 
 def getScheduleData(id):
-	group.Reply(schedules[id])
+	if id in schedules:
+		group.Reply(schedules[id])
+	else:
+		group.Reply(-1)
 	print("Vsync server getScheduleData with id=" + id.ToString())
 
 def removeScheduleData_api(id):

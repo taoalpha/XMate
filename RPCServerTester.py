@@ -7,6 +7,7 @@ print "Test client ready"
 def testPostUserData():
 	s.postUserData("1", "UserData1")
 	assert s.getUserData("1") == "UserData1"
+	assert s.getUserData("2") == "-1"
 
 def testRemoveUserData():
 	s.postUserData("1", "UserData1")
@@ -35,6 +36,7 @@ def testRemoveUserDataMultiple():
 def testPostMessageData():
 	s.postMessageData("1", "MessageData1")
 	assert s.getMessageData("1") == "MessageData1"
+	assert s.getMessageData("2") == "-1"
 
 def testRemoveMessageData():
 	s.postMessageData("1", "MessageData1")
@@ -63,6 +65,7 @@ def testRemoveMessageDataMultiple():
 def testPostScheduleData():
 	s.postScheduleData("1", "ScheduleData1")
 	assert s.getScheduleData("1") == "ScheduleData1"
+	assert s.getScheduleData("2") == "-1"
 
 def testRemoveScheduleData():
 	s.postScheduleData("1", "ScheduleData1")
