@@ -25,7 +25,7 @@ def scheduleDispatch(sid,field,request,db):
     '''
     res = {}
     res["field"] = field
-    res["sid"] = sid
+    res["_id"] = sid
 
     # store any possible err msg
     res["err"] = {"status":0}
