@@ -7,20 +7,35 @@
 //
 
 import UIKit
+import FBSDKCoreKit
+import FBSDKLoginKit
 
 class ProfileViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 	
-	let tableData = ["Gender", "Birthdate", "Height", "Weight"]
+	@IBOutlet weak var firstName: UITextField!
+	@IBOutlet weak var lastName: UITextField!
+	@IBOutlet weak var email: UITextField!
 	
+	private let SUCCESSE_STATUS = "1"
+	private let userURL = "http://192.168.99.100:2000/user/"
+	private let tableData = ["Gender", "Birthdate", "Height", "Weight"]
+	
+	private var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+	private var gender = ""
+	private var birthday = ""
+	private var height = ""
+	private var weight = ""
+		
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		// Do any additional setup after loading the view, typically from a nib.
 		
-	}
-	
-	override func didReceiveMemoryWarning() {
-		super.didReceiveMemoryWarning()
-		// Dispose of any resources that can be recreated.
+//		self.appDelegate.xmate.post(userURL, mode: "user")
+
+		self.firstName.text = self.appDelegate.xmate.user["first_name"] as? String
+		self.lastName.text = self.appDelegate.xmate.user["last_name"] as? String
+		self.email.text = self.appDelegate.xmate.user["email"] as? String
+
 	}
 	
 	func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -32,9 +47,15 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
 	}
 	
 	func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("profileCell", forIndexPath: indexPath)
+		let cell = tableView.dequeueReusableCellWithIdentifier(self.tableData[indexPath.row], forIndexPath: indexPath)
+		let index = indexPath.row
 		
-		cell.textLabel?.text = self.tableData[indexPath.row]
+		cell.textLabel?.text = self.tableData[index]
+		
+		if index == 0
+		{
+			cell.detailTextLabel?.text = self.appDelegate.xmate.user["gender"] as? String
+		}
 		
 		return cell
 	}
@@ -44,7 +65,6 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
 		
 		let index = indexPath.row
 		let cell = tableView.cellForRowAtIndexPath(indexPath)!
-		
 		
 		switch index
 		{
@@ -64,13 +84,18 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
 			break
 		}
 		//tableView.deselectRowAtIndexPath(indexPath, animated: true)
-		
 	}
 	
 	func genderPicker(cell: UITableViewCell) {
 		let alertController = UIAlertController(title:nil, message: nil, preferredStyle: UIAlertControllerStyle.ActionSheet)
-		let male = UIAlertAction(title: "Male", style: UIAlertActionStyle.Default, handler: {(action) -> Void in cell.detailTextLabel?.text = "Male"})
-		let female = UIAlertAction(title: "Female", style: UIAlertActionStyle.Default, handler: {(action) -> Void in cell.detailTextLabel?.text = "Female"})
+		let male = UIAlertAction(title: "Male", style: UIAlertActionStyle.Default, handler: {(action) -> Void in
+			cell.detailTextLabel?.text = "Male"
+			self.gender = (cell.detailTextLabel?.text)!
+		})
+		let female = UIAlertAction(title: "Female", style: UIAlertActionStyle.Default, handler: {(action) -> Void in
+			cell.detailTextLabel?.text = "Female"
+			self.gender = (cell.detailTextLabel?.text)!
+		})
 		
 		alertController.addAction(male)
 		alertController.addAction(female)
@@ -79,17 +104,22 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
 	}
 	
 	func birthdatePicker(cell: UITableViewCell) {
+		
 		let alertController = UIAlertController(title: "\n\n\n\n\n\n\n\n\n", message: nil, preferredStyle: UIAlertControllerStyle.ActionSheet)
-		let datePicker = UIDatePicker()
+		let datePicker = UIDatePicker(frame: CGRectMake(25, 0, 305, 200))
+		let formatter = NSDateFormatter()
+		
 		datePicker.datePickerMode = UIDatePickerMode.Date
 		datePicker.date = NSDate()
-		let formatter = NSDateFormatter()
 		formatter.dateStyle = .MediumStyle
-		let done = UIAlertAction(title: "Done", style: UIAlertActionStyle.Default, handler: {(action) -> Void in cell.detailTextLabel?.text = formatter.stringFromDate(datePicker.date)})
+		
+		let done = UIAlertAction(title: "Done", style: UIAlertActionStyle.Default, handler: {(action) -> Void in
+			cell.detailTextLabel?.text = formatter.stringFromDate(datePicker.date)
+			self.birthday = (cell.detailTextLabel?.text)!
+		})
+		
 		alertController.addAction(done)
-		
 		alertController.view.addSubview(datePicker)
-		
 		self.presentViewController(alertController, animated: true, completion: nil)
 	}
 	
@@ -102,6 +132,15 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
 	}
 	
 	@IBAction func goToHome(sender: UIBarButtonItem) {
+		self.appDelegate.xmate.user["first_name"] = firstName.text
+		self.appDelegate.xmate.user["last_name"] = lastName.text
+		self.appDelegate.xmate.user["email"] = email.text
+		
+		self.appDelegate.xmate.user["gender"] = self.gender
+		self.appDelegate.xmate.user["birthday"] = self.birthday
+		self.appDelegate.xmate.user["height"] = self.height
+		self.appDelegate.xmate.user["weight"] = self.weight
+		
 		self.performSegueWithIdentifier("showHome", sender: self)
 	}
 	

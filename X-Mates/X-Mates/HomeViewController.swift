@@ -7,14 +7,25 @@
 //
 
 import UIKit
+import FBSDKCoreKit
+import FBSDKLoginKit
 
 class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 	
 	@IBOutlet weak var dateLabel: UILabel!
 	@IBOutlet weak var openMenuBar: UIBarButtonItem!
 	
-	let dummyActivities = ["Running", "Basketball", "Gym Workout"]
-	let dummyDates = ["Mar 21, 2016", "Mar 28, 2016", " Mar 29, 2016"]
+	private var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+	
+	let dummyActivities = ["Running", "Running", "Basketball"]
+	let dummyDates = ["April 17, 2016", "April 22, 2016", " April 27, 2016"]
+	
+	private let userURL = "http://192.168.99.100:2000/user/"
+	
+	override func viewDidAppear(animated: Bool) {
+		super.viewDidAppear(animated)
+//		self.appDelegate.xmate.get(userURL, mode: "user")
+	}
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -27,11 +38,7 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
 		openMenuBar.action = Selector("revealToggle:")
 		
 		self.view.addGestureRecognizer(self.revealViewController().panGestureRecognizer())
-	}
-	
-	override func didReceiveMemoryWarning() {
-		super.didReceiveMemoryWarning()
-		// Dispose of any resources that can be recreated.
+		
 	}
 	
 	@IBAction func goToSearchExercise(sender: UIButton) {
@@ -47,8 +54,8 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
 	}
 	
 	func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("upcomingCell", forIndexPath: indexPath)
 		
+		let cell = tableView.dequeueReusableCellWithIdentifier("upcomingCell", forIndexPath: indexPath)
 		cell.textLabel?.text = self.dummyActivities[indexPath.row]
 		cell.detailTextLabel?.text = self.dummyDates[indexPath.row]
 		

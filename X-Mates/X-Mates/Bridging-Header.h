@@ -12,5 +12,6 @@
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 #import <FBSDKLoginKit/FBSDKLoginKit.h>
 #import "SWRevealViewController.h"
+#import <Just/Just-Swift.h>
 
 #endif /* Bridging_Header_h */
