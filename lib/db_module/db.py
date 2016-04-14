@@ -74,8 +74,11 @@ class CDatabase:
                 insert one document into user collection
             Args:
                 data is a json type document
+                type: user/schedule/message
             Ret:
-                return res(object), res.inserted_id is the inserted document's id
+                return json:
+                    res.inserted_id
+                    res.content
         '''
         try:
             res = self.collection.insert_one(data)
