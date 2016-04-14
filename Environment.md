@@ -1,11 +1,26 @@
+# Instructions for setting up Vsync within Docker container
+
 ### Get access to your Docker container image
 
 ```sh
-docker run -ti IMAGE_NAME #The -i flag starts an interactive container. The -t flag creates a pseudo-TTY that attaches stdin and stdout.
+docker run -ti IMAGE_NAME 
+# The -i flag starts an interactive container. 
+# The -t flag creates a pseudo-TTY that attaches stdin and stdout.
+```
+Your probably want to start with Ubuntu's image. Search ubuntu on [docker hub](http://www.mono-project.com/docs/getting-started/install/linux/#usage)
+
+To install some basic packages, execute the following commands
+
+``` sh
+apt-get update
+apt-get install python curl vim 
+curl https://bootstrap.pypa.io/get-pip.py | python
+pip install flask geopy moment
 ```
 
 ### Set up Mono on Linux/Ubuntu within Docker
 
+See [mono-project.com](http://www.mono-project.com/docs/getting-started/install/linux/#usage)
 
 ### Set up IronPython on Linux/Ubuntu within Docker
 #### Get source file
