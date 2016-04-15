@@ -173,7 +173,8 @@ class CDatabase:
         content = []
         try:
             for i in range(0,length):
-                res = self.insertData(type,id_list[i],data_list[i])
+                data_list[i]["_id"] = id_list[i]
+                res = self.insertData(type,[data_list[i]])
                 content.append(res["content"])
             return self.returnHelper(1, "", content)
         except:
@@ -216,7 +217,8 @@ class CDatabase:
         res = {}
         res["status"] = status
         res["msg"] = msg
-        res["error"] = sys.exc_info()
+        #res["error"] = sys.exc_info()
+        res["error"] = "error"
         res["content"] = content
 
         return res
