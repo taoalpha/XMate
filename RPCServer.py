@@ -1,6 +1,6 @@
 from System import Action
 import clr
-clr.AddReference('VsyncLib') # The profile of the dll file.
+clr.AddReference('Vsync') # The profile of the dll file.
 import Vsync
 
 #from threading import Thread

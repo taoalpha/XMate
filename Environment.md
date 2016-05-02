@@ -73,7 +73,7 @@ chmod +x ipy
 mv ipy /usr/local/bin/ipy
 ```
 
-Add `YOUR_DIR/IronLanguages/External.LCA_RESTRICTED/Languages/IronPython/27/Lib` to an IRONPYTHONPATH environment variable so that it can find some basic python modules supported by IronPython.
+Add `YOUR_DIR/External.LCA_RESTRICTED/Languages/IronPython/27/Lib` to an IRONPYTHONPATH environment variable so that it can find some basic python modules supported by IronPython.
 
 Now, type `ipy` in the command and you should see IronPython prompt.
 
