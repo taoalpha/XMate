@@ -97,7 +97,7 @@ class CDatabase:
                     self.rpc.postUserData(data["_id"],data_to_string)
                     content.append(data)
                 elif type == "schedule":
-                    id = hashlib.md5(data["type"]+data["creator"]+data["created_time"]).hexdigest()
+                    id = hashlib.md5(data["type"]+data["creator"]+str(int(data["created_time"]))).hexdigest()
                     self.rpc.postScheduleData(id,data_to_string)
                     data["_id"] = id
                     content.append(data)

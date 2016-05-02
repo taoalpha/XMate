@@ -1,5 +1,3 @@
-from bson.objectid import ObjectId
-
 FIELDS = {
     "profile": ["username","age","gender","preferred","address"],
     "schedule": ["schedule_list"],
@@ -23,12 +21,7 @@ def delData(request,res,db):
             3. fail to delete data
     '''
     # error handler for invalid objectid
-    if not ObjectId.is_valid(res["mid"]):
-        res["err"]["status"] = 1
-        res["err"]["msg"] = "wrong id"
-        return res
-
-    data = {"_id":ObjectId(res["mid"])}
+    data = {"_id":res["mid"]}
 
     # data = {"sid":{"$in":schedule_list}}
     docs = db.removeData(data)

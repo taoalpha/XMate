@@ -31,7 +31,7 @@ def user(uid,action):
     return json.dumps(userDispatch(uid,action,request,db))
 
 
-@app.route('/schedule', defaults={'sid':None, 'action': None},methods=['GET', 'POST'])
+@app.route('/schedule/', defaults={'sid':None, 'action': None},methods=['GET', 'POST'])
 @app.route('/schedule/<sid>', defaults={'action': None},methods=['GET', 'PUT', 'DELETE'])
 @app.route('/schedule/<sid>/<action>')
 def schedule(sid,action):
@@ -41,7 +41,7 @@ def schedule(sid,action):
     #db.selectCollection("xmateHistoryPost")
     return jsonify(**scheduleDispatch(sid,action,request,db))
 
-@app.route('/message', defaults={'mid':None, 'action': None},methods=['GET', 'POST','PUT','DELETE'])
+@app.route('/message/', defaults={'mid':None, 'action': None},methods=['GET', 'POST','PUT','DELETE'])
 @app.route('/message/<mid>', defaults={'action': None},methods=['DELETE','GET','POST','PUT'])
 @app.route('/message/<mid>/<action>',methods=['GET','POST','PUT'])
 def message(mid,action):

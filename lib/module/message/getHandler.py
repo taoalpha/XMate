@@ -1,5 +1,3 @@
-from bson.objectid import ObjectId
-
 FIELDS = {
     "profile": ["username","age","gender","preferred","address"],
     #"profile": ["username","age","gender","preferred","address","height","width","avatar"],
@@ -25,13 +23,7 @@ def getData(request,res,db):
     '''
 
     # error handler for invalid objectid
-    if not ObjectId.is_valid(res["mid"]):
-        #res["err"]["status"] = 1
-        #res["err"]["msg"] = "wrong id"
-        #return res
-        data = {"mid":int(res["mid"])}
-    else:
-        data = {"_id":ObjectId(res["mid"])}
+    data = {"_id":res["mid"]}
 
     print data
 
