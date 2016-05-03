@@ -1,7 +1,18 @@
 #!/usr/bin/python
-
+FIELD = {
+    "_id":"",
+    "type":"",
+    "latitude":"",
+    "longitude":"",
+    "start_time":"",
+    "end_time":"",
+    "post_time":"",
+    "owner":"", 
+    "member":[]
+}
 # Dispatch function for user api
 from ..db_module import computematch as CM
+import moment
 
 def delData(request,res,db):
     '''
@@ -9,7 +20,7 @@ def delData(request,res,db):
             delete the schedule exercise by id
         Args:
             request: maybe useful
-            res: id stores in res["sid"], and update res with proper information
+            res: id stores in res["_id"], and update res with proper information
         Err:
             1. invalid objectId
             2. fail to delete data
@@ -55,6 +66,7 @@ def postData(request,res,db):
     for key in request.form:
         data[key] = request.form[key]
 
+    data["created_time"] = moment.now().epoch()
     res = db.insertData("schedule",[data])
     return res
 
@@ -74,7 +86,7 @@ def getData(request,res,db):
     # error handler for invalid objectid
 
     data = res["_id"]
-    docs = db.getData("schedule",data)
+    docs = db.getData("schedule",[data])
 
     return docs
 
@@ -105,29 +117,6 @@ def getData(request,res,db):
 #         print(len(res["content"]["entries"]))
 #         return res
 
-
-
-
-
-FIELDS = {
-    "_id":"",
-    "type":"",
-    "latitude":"",
-    "longitude":"",
-    "start_time":"",
-    "end_time":"",
-    "post_time":"",
-    "owner":"", 
-    "member":[]
-}
-# define dispatch dictionary
-DISPATCH = {
-    "GET": getData,
-    "POST": postData,
-    "PUT": putData,
-    "DELETE": delData,
-}
-
 def scheduleDispatch(sid,field,request,db):
     '''
         Desc:
@@ -139,7 +128,7 @@ def scheduleDispatch(sid,field,request,db):
     '''
     res = {}
     res["field"] = field
-    res["sid"] = sid
+    res["_id"] = sid
     # store any possible err msg
     res["status"] = 1
 
@@ -157,4 +146,13 @@ def scheduleDispatch(sid,field,request,db):
     if (res["status"] != 1):
         return res
     return res["content"][0]
+
+# define dispatch dictionary
+DISPATCH = {
+    "GET": getData,
+    "POST": postData,
+    "PUT": putData,
+    "DELETE": delData,
+}
+
 

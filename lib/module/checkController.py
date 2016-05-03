@@ -1,6 +1,5 @@
 #!/usr/bin/python
 import moment
-from bson.objectid import ObjectId
 
 # Dispatch function for user api
 
@@ -39,12 +38,12 @@ def checkMsg(mydb):
         return returnHelper()
     for msg in cursor:
         outoftime_msg.append(msg["_id"])
-        related_userlist.add(ObjectId(msg["receiver_id"]))
-        if(ObjectId(msg["receiver_id"]) in user_msg.keys()):
+        related_userlist.add(msg["receiver_id"])
+        if(msg["receiver_id"] in user_msg.keys()):
             pass
         else:
-            user_msg[ObjectId(msg["receiver_id"])] = []
-        user_msg[ObjectId(msg["receiver_id"])].append(msg["_id"])
+            user_msg[msg["receiver_id"]] = []
+        user_msg[msg["receiver_id"]].append(msg["_id"])
     related_userlist = list(related_userlist)
 
     res = mydb.selectCollection("xmateUser")
@@ -183,7 +182,7 @@ def updateUserHistoryPartner(schedule, db):
     uids = list(set(user_list))
 
     for uid in uids:
-        match_list = {"_id": ObjectId(uid)}
+        match_list = {"_id": uid}
         res = db.getData( match_list )
         # handle db err
         if res["status"]:
@@ -230,7 +229,7 @@ def updateUserScheduleList(schedule,db):
     user_list.append(schedule["owner"])
 
     for uid in list(set(user_list)):
-        match_list = {"_id": ObjectId(uid)}
+        match_list = {"_id": uid}
         res = db.getData( match_list )
         # handle db err
         if res["status"]:
@@ -322,7 +321,7 @@ def checkConflict(raw_schedule_list,db):
 
     schedule_list = []
     for sid in list(set(raw_schedule_list)):
-        schedule_list.append(ObjectId(sid))
+        schedule_list.append(sid)
 
     res = db.getData( { "_id": { "$in" : schedule_list } } )
     # handle db err
@@ -417,7 +416,7 @@ def updateUserUnprocessedList(uid,mid,db):
         return res
 
     # get the user data
-    res = db.getData( { "_id": ObjectId(uid) } )
+    res = db.getData( { "_id": uid } )
     # handle db err
     if res["status"]:
         return res
@@ -430,7 +429,7 @@ def updateUserUnprocessedList(uid,mid,db):
     if str(mid) in unprocessed_list:
         # update the list if it has the message
         unprocessed_list.remove(str(mid))
-        res = db.updateData({ "_id": ObjectId(uid) }, { "unprocessed_message": unprocessed_list })
+        res = db.updateData({ "_id": uid }, { "unprocessed_message": unprocessed_list })
         if res["status"]:
             return res
 
