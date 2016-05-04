@@ -47,7 +47,7 @@ def generateUser():
         }
     '''
     user = {}
-    user["_id"] = random.getrandbits(20)
+    user["_id"] = ''.join(random.choice(string.ascii_lowercase+string.digits) for _ in range(8))
     user["username"] = random.choice(string.ascii_uppercase)+''.join(random.choice(string.ascii_lowercase) for _ in range(7)) +  " " + random.choice(string.ascii_uppercase)+''.join(random.choice(string.ascii_lowercase) for _ in range(7))
     user["age"] = ''.join(random.choice(string.digits) for _ in range(2))
     user["gender"] = ["male", "female"][(random.random() > 0.5)]
@@ -72,8 +72,9 @@ P_FIELD = {
     "longitude":"",
     "start_time":"",
     "end_time":"",
-    "post_time":"",
+    "created_time":"",
     "owner":"",
+    "creator":"",
     "member":[]
 }
 
@@ -84,6 +85,7 @@ def generatePost(uid):
     '''
     post = {}
     post["owner"] = uid
+    post["creator"] = uid
     post["type"] = ["tennis","running","swimming","hiking","poker","movie","gym","game","concert","skating"][int(random.random()*10)]
     post["latitude"] = float(''.join(random.choice(string.digits) for _ in range(5))) / 1000
     post["longitude"] = float(''.join(random.choice(string.digits) for _ in range(5))) / 1000
@@ -92,7 +94,7 @@ def generatePost(uid):
     # < 3 hours from start_time
     post["end_time"] = post["start_time"] + int(random.random()*3*60*60)
     # < 2 days to now
-    post["post_time"] = moment.now().epoch() - int(random.random()*86400*2)
+    post["created_time"] = moment.now().epoch() - int(random.random()*86400*2)
 
     for i in P_FIELD:
         if i not in post:

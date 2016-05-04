@@ -2,22 +2,22 @@ import requests
 import random
 import userdata as DG
 
-postUrl = "http://localhost:5000"
+postUrl = "http://192.168.99.100:2000"
 
 def sendUser(profile):
     r = requests.post(postUrl+'/user/', data = profile)
-    if (r.json()["status"] != 1) :
+    if ("status" in r.json() and r.json()["status"] != 1) :
         raise Exception('Fail', 'Send User')
 
 def sendPost(profile):
     r = requests.post(postUrl+'/schedule/', data = profile)
-    if (r.json()["status"] != 1) :
+    if ("status" in r.json() and r.json()["status"] != 1) :
         raise Exception('Fail', 'Send Post')
     return r.json()
 
 def sendMsg(profile):
     r = requests.post(postUrl+'/message/', data = profile)
-    if (r.json()["status"] != 1) :
+    if ("status" in r.json() and r.json()["status"] != 1) :
         raise Exception('Fail', 'Send Msg')
     return r.json()
 
@@ -75,7 +75,7 @@ for i in range(msgNum):
     sid = (fbids.keys())[int(random.random()*userNum)]
     rid = (fbids.keys())[int(random.random()*userNum)]
     # join : post must be in receiver's posts list
-    userPostLen = len(fbids[sid]["posts"])
+    userPostLen = len(fbids[rid]["posts"])
     if userPostLen > 0:
         pid = fbids[rid]["posts"][int(random.random()*userPostLen)]
         # generate msg
@@ -85,3 +85,7 @@ for i in range(msgNum):
         # store msgid
         fbids[rid]["msg"].append(r["_id"])
         pids[pid]["msg"].append(r["_id"])
+
+
+print fbids
+print pids
