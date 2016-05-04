@@ -194,8 +194,16 @@ class CDatabase:
         content = []
         try:
             for i in range(0,length):
-                res = self.insertData(type,id_list[i],"")
-                content.append(res["content"])
+                if type == 'message':
+                    res = self.rpc.removeMessageData(id_list[i])
+                    content.append(res)
+                elif type == 'schedule':
+                    res = self.rpc.removeScheduleData(id_list[i])
+                    content.append(res)
+                elif type == 'user':
+                    res = self.rpc.removeUserData(id_list[i])
+                    content.append(res)
+
             return self.returnHelper(1, "", content)
         except:
             return self.returnHelper(2,"Failed to connect to rpc")

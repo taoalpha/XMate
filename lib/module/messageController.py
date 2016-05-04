@@ -24,7 +24,6 @@ def messageDispatch(mid,action,request,db):
     '''
 
     res = {}  # store all temp result
-    res["action"] = action
     res["_id"] = mid
 
     # content stores all validate information
@@ -37,14 +36,13 @@ def messageDispatch(mid,action,request,db):
         #tempResp = checkController.checkSchedule(db)
         res["status"] = 4
 	res["msg"] = "Forbidden operation!!"
-	return res["err"]
+	return res
+
 
     if request.method == "POST":
         res["action"] = request.form["type"]
         if res["action"] == "join":
             tempRes = msgDelivery.sendJoin(request.form["sender_id"],request.form["post_id"],db)
-            print "##sending the join##"
-            print tempRes
             if tempRes["status"] != 1:
                 # some errors happen
                 res["status"] = tempRes["status"]
@@ -65,10 +63,13 @@ def messageDispatch(mid,action,request,db):
                 # reeturn the message id in our system
                 res["content"] = tempRes["content"]
                 return res["content"]
+
+    # for decline or accept or read
     elif request.method == "PUT":
+        res["action"] = request.form["type"]
         if res["action"] == "decline":
             tempRes = msgDelivery.declineRequest(request.form["sender_id"], request.form["_id"], db)
-	    if tempRes["status"] != 1:
+            if tempRes["status"] != 1:
                 # some errors happen
                 res["status"] = tempRes["status"]
                 res["msg"] = tempRes["msg"]
@@ -79,7 +80,7 @@ def messageDispatch(mid,action,request,db):
                 return res["content"]
         elif res["action"] == "accept":
             tempRes = msgDelivery.acceptRequest(request.form["sender_id"], request.form["_id"], db)
-	    if tempRes["status"] != 1:
+            if tempRes["status"] != 1:
                 # some errors happen
                 res["status"] = tempRes["status"]
                 res["msg"] = tempRes["msg"]
@@ -127,6 +128,9 @@ def messageDispatch(mid,action,request,db):
 
         data = res["_id"]
         docs = db.getData("message",[data])
+        if docs["status"] != 1:
+            return docs
+
         return docs["content"][0]
 
     # if any err, return with err status

@@ -62,7 +62,7 @@ def removeUserData_api(id):
 	"""set a user profile to be "" in the user DHT with the given id.
 		id is a string.
 	"""
-	group.Send(2, id)
+	group.Send(0, id, '-1')
 	return "profile" # just for flask
 server.register_function(removeUserData_api,'removeUserData')
 
@@ -108,7 +108,7 @@ def removeMessageData_api(id):
 	"""set a message to be "" in the message DHT with the given id.
 		id is a string.
 	"""
-	group.Send(5, id)
+	group.Send(3, id, '-1')
 	return "message" # just for flask
 server.register_function(removeMessageData_api,'removeMessageData')
 
@@ -153,7 +153,7 @@ def removeScheduleData_api(id):
 	"""set a schedule to be "" in the schedule DHT with the given id.
 		id is a string.
 	"""
-	group.Send(8, id)
+	group.Send(6, id, '-1')
 	return "profile"
 server.register_function(removeScheduleData_api,'removeScheduleData')
 

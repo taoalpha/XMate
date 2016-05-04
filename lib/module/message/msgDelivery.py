@@ -140,8 +140,6 @@ def sendJoin(uid, pid, mydb):
     id_list = []
     id_list.append(pid)
     res = mydb.getData("schedule",id_list)
-    print "###get message from send join"
-    print res
     if(res["status"] != 1):
         return res
     doc = res["content"][0]
@@ -216,7 +214,9 @@ def declineRequest(uid, mid, mydb):
     res = createMsg("plaintext", uid, rid, post_id, content, mydb)
     if(res["status"] != 1):
         return res
-    msg_id = res["content"][0]
+
+    msg = res["content"][0]
+    msg_id = msg["_id"]
 
     #update the recevier's message list
     res = insertMessage(rid, msg_id, mydb)
@@ -255,7 +255,7 @@ def acceptRequest(uid, mid, mydb):
     if(user_id in doc["member"]):
         pass
     else:
-        doc["member"].append(user_id)
+        doc["member"].append(rid)
         data_list = []
         data_list.append(doc)
         res = mydb.updateData("schedule",id_list,data_list)
@@ -269,17 +269,25 @@ def acceptRequest(uid, mid, mydb):
     if(res["status"] != 1):
         return res
     user = res["content"][0]
+    print user
     if(post_id in user["schedule_list"]):
         pass
     else:
+        print "before conflict check"
         res = updateConflict(user["schedule_list"], user["conflict_list"],post_id, mydb)
+        print "after conflict check"
+        print res
+        print user
         if(res["status"] != 1):
             return res
         user["conflict_list"] = res["content"]
         user["schedule_list"].append(post_id)
         data_list = []
         data_list.append(user)
+        print "before update user data"
         res = mydb.updateData("user",id_list,data_list)
+        print "after update user"
+        print res
         if(res["status"] != 1):
             return res
 
@@ -314,7 +322,9 @@ def leavePost(uid, pid, mydb):
             res = createMsg("plaintext", uid, new_owner, pid,"You become the owner of the Post",mydb)
             if(res["status"] != 1):
                 return res
-            msg_id = res["content"][0]
+            msg = res["content"][0]
+            msg_id = msg["_id"]
+
             res = insertMessage(new_owner, msg_id, mydb)
         else:
             deletePost = True
@@ -330,7 +340,8 @@ def leavePost(uid, pid, mydb):
             res = createMsg("plaintext", uid, doc["owner"], pid,"Someone leaves your post",mydb)
             if(res["status"] != 1):
                 return res
-            msg_id = res["content"][0]
+            msg = res["content"][0]
+            msg_id = msg["_id"]
             res = insertMessage(doc["owner"], msg_id, mydb)
 
 
@@ -371,7 +382,7 @@ def finishReadMsg(uid, mid, mydb):
     id_list = []
     data_list = []
     id_list.append(uid)
-    res = mydb.getData("user",uid)
+    res = mydb.getData("user",id_list)
     if(res["status"] != 1):
         return res
     doc = res["content"][0]
@@ -387,6 +398,7 @@ def finishReadMsg(uid, mid, mydb):
     id_list = []
     id_list.append(mid)
     res = mydb.removeData("message",id_list)
+    print res
     if(res["status"] != 1):
         return res
 

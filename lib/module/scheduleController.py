@@ -7,7 +7,7 @@ FIELD = {
     "start_time":"",
     "end_time":"",
     "post_time":"",
-    "owner":"", 
+    "owner":"",
     "member":[]
 }
 # Dispatch function for user api
@@ -68,6 +68,22 @@ def postData(request,res,db):
 
     data["created_time"] = moment.now().epoch()
     res = db.insertData("schedule",[data])
+    if (res["status"] != 1):
+        return res
+
+    pid = res['content'][0]["_id"]
+
+    # update schedule_list for its owner
+    userRes = db.getData("user",[request.form["creator"]])
+    if (userRes["status"] != 1):
+        return userRes
+    user = userRes["content"][0]
+    # need to check conflict
+    user["schedule_list"].append(pid)
+    userRes = db.updateData("user",[request.form["creator"]],[user])
+    if (userRes["status"] != 1):
+        return userRes
+
     return res
 
 # define the getData function
