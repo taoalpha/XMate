@@ -252,10 +252,8 @@ def acceptRequest(uid, mid, mydb):
         user_id = sid
     else:
         user_id = rid
-    if(user_id in doc["member"]):
-        pass
-    else:
-        doc["member"].append(rid)
+    if(user_id not in doc["member"]):
+        doc["member"].append(user_id)
         data_list = []
         data_list.append(doc)
         res = mydb.updateData("schedule",id_list,data_list)
@@ -270,24 +268,16 @@ def acceptRequest(uid, mid, mydb):
         return res
     user = res["content"][0]
     print user
-    if(post_id in user["schedule_list"]):
-        pass
-    else:
-        print "before conflict check"
+    if(post_id not in user["schedule_list"]):
         res = updateConflict(user["schedule_list"], user["conflict_list"],post_id, mydb)
-        print "after conflict check"
-        print res
-        print user
         if(res["status"] != 1):
             return res
         user["conflict_list"] = res["content"]
         user["schedule_list"].append(post_id)
+        user["schedule_list"] = list(set(user["schedule_list"]))
         data_list = []
         data_list.append(user)
-        print "before update user data"
         res = mydb.updateData("user",id_list,data_list)
-        print "after update user"
-        print res
         if(res["status"] != 1):
             return res
 
