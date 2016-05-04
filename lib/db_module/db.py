@@ -105,7 +105,6 @@ class CDatabase:
                     id = hashlib.md5(data["sender_id"]+data["receiver_id"]+data["post_id"]).hexdigest()
                     self.rpc.postMessageData(id,data_to_string)
                     data["_id"] = id
-                    print data
                     content.append(data)
                 else:
                     return self.returnHelper(3, "invalid type")
@@ -152,6 +151,7 @@ class CDatabase:
             elif type == "message":
                 for i in id_list:
                     content.append(json.loads(self.rpc.getMessageData(i)))
+
                 return self.returnHelper(1, "", content)
             else:
                 return self.returnHelper(3, "invalid type")
@@ -215,10 +215,14 @@ class CDatabase:
                     if status == 1, store real content
         '''
         res = {}
-        res["status"] = status
-        res["msg"] = msg
-        #res["error"] = sys.exc_info()
-        res["error"] = "error"
-        res["content"] = content
+        if content != None and "".join(str(x) for x in content) == "-1":
+            res["status"] = 0
+            res["msg"] = "no match"
+        else:
+            res["status"] = status
+            res["msg"] = msg
+            #res["error"] = sys.exc_info()
+            res["error"] = "error"
+            res["content"] = content
 
         return res
