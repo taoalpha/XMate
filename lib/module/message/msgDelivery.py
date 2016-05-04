@@ -7,7 +7,7 @@ def returnHelper(status = 1, msg = None,content = None):
     return_val = {}
     return_val["status"] = status
     return_val["msg"] = msg
-    return_val["content"] = str(content)
+    return_val["content"] = content
 
     return return_val
 
@@ -26,6 +26,7 @@ def createMsg(mtype, send_id, receive_id, post_id, content, mydb, create_time = 
     data_list.append(msg)
 
     res = mydb.insertData("message", data_list)
+
     if(res["status"] != 1):
         return res
 
@@ -49,7 +50,7 @@ def insertMessage(uid, mid, mydb):
         if(res["status"] != 1):
             return res
 
-    return returnHelper()
+    return returnHelper(content = {"_id":mid})
 
 
 def leavecheck(uid,pid,mydb):
@@ -97,7 +98,7 @@ def updateConflict(post_list, conflict_list, post_id, mydb):
                 if(minen > maxst):
                     nconflict_list.add(cursor[i]["_id"])
                     nconflict_list.add(cursor[j]["_id"])
-        
+
         nconflict_list = list(nconflict_list)
         return returnHelper(content = nconflict_list)
 
@@ -111,7 +112,7 @@ def updateConflict(post_list, conflict_list, post_id, mydb):
         if(res["status"] != 1):
             return res
         cursor = res["content"]
-        flag = False  
+        flag = False
         st = 0
         en = 0
 
@@ -139,11 +140,13 @@ def sendJoin(uid, pid, mydb):
     id_list = []
     id_list.append(pid)
     res = mydb.getData("schedule",id_list)
+    print "###get message from send join"
+    print res
     if(res["status"] != 1):
         return res
     doc = res["content"][0]
     owner_id = doc["owner"]
-    
+
     #create a msg
     id_list = []
     id_list.append(uid)
@@ -155,19 +158,23 @@ def sendJoin(uid, pid, mydb):
     res = createMsg("join", uid, owner_id, pid,str(sender_name) + " want to join your post", mydb)
     if(res["status"] != 1):
         return res
-    msg_id = res["content"][0]
+
+    msg = res["content"][0]
+    msg_id = msg["_id"]
 
     #update the info of receiver message list
     return insertMessage(owner_id, msg_id, mydb)
 
 
-
 def sendInvitation(uid, pid, rid, mydb):
     #create message
+
     res = createMsg("invation", uid, rid, pid, "You are invited to the post", mydb)
     if(res["status"] != 1):
         return res
-    msg_id = res["content"][0]
+
+    msg = res["content"][0]
+    msg_id = msg["_id"]
 
     return insertMessage(rid, msg_id, mydb)
 
@@ -181,7 +188,7 @@ def declineRequest(uid, mid, mydb):
     if(res["status"] != 1):
         return res
     msg = res["content"][0]
-    
+
     rid = msg["sender_id"]
     msg_type = msg["type"]
     post_id = msg["post_id"]
@@ -196,7 +203,7 @@ def declineRequest(uid, mid, mydb):
         res = mydb.getData("schedule",id_list)
         if(res["status"] != 1):
             return res
-        
+
         id_list = []
         id_list.append(uid)
         res = mydb.getData("user",id_list)
@@ -242,13 +249,13 @@ def acceptRequest(uid, mid, mydb):
     doc = res["content"][0]
     user_id = ""
     if(msg_type == "join"):
-        user_id = sid 
+        user_id = sid
     else:
         user_id = rid
     if(user_id in doc["member"]):
         pass
     else:
-        doc["member"].append(user_id) 
+        doc["member"].append(user_id)
         data_list = []
         data_list.append(doc)
         res = mydb.updateData("schedule",id_list,data_list)
@@ -280,7 +287,7 @@ def acceptRequest(uid, mid, mydb):
 
 
 def leavePost(uid, pid, mydb):
-    
+
     #get owner id from pid
     id_list = []
     id_list.append(pid)
@@ -359,7 +366,7 @@ def leavePost(uid, pid, mydb):
 
 ######remind Tao to delete for plaintext
 def finishReadMsg(uid, mid, mydb):
-    
+
     #update the user unprocessed list by removing the message
     id_list = []
     data_list = []
@@ -409,7 +416,7 @@ def checkMsg(mydb):
                 related_user[msg["receiver_id"]] = []
             related_user[msg["receiver_id"]].append(msg["_id"])
     if(len(outoftime_msg) == 0):
-        return returnHelper() 
+        return returnHelper()
 
     #update users' unprocessed msg list by removing the out of date msgs
     id_list = related_user.keys()
@@ -419,7 +426,7 @@ def checkMsg(mydb):
     cursor = res["content"]
 
     id_list = []
-    data_list = []  
+    data_list = []
     for user in cursor:
         for msg_id in related_user[user["_id"]]:
             if(msg_id in user["unprocessed_message"]):

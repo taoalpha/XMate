@@ -24,6 +24,7 @@ def hello_world():
 @app.route('/user/<uid>/<action>')
 def user(uid,action):
     status = db.getStatus()
+    print status
     if status["status"] != 1:
         db.buildConnection()
     #return jsonify(**userDispatch(uid,action,request,db))
@@ -45,7 +46,10 @@ def schedule(sid,action):
 @app.route('/message/<mid>', defaults={'action': None},methods=['DELETE','GET','POST','PUT'])
 @app.route('/message/<mid>/<action>',methods=['GET','POST','PUT'])
 def message(mid,action):
-    print request.method
+    status = db.getStatus()
+    if status["status"] != 1:
+        db.buildConnection()
+
     return jsonify(**messageDispatch(mid,action,request,db))
 
 # test for vsync connection
