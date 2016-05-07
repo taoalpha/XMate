@@ -20,10 +20,15 @@ def getHash(post_content):
 
     return hashlib.md5(strhash).hexdigest()
 
-def Judge(cache_return):
+def Judge(type,cache_return):
     t = chache_return["create_time"]
     current_time = moment.now().epoch()
-    if(t - current_time > 3600):
+
+    threshold = 3600
+    if(type == "post")
+        threshold = 7200
+
+    if(t < current_time - threshold):
         return True
     else:
         return False
@@ -42,7 +47,7 @@ def computeMatchPosts(post_content, mydb):
     res = mydb.getData("cache",id_list)
     if(res["status"] != 0):
         if(res["status"] == 1):
-            outofdate = Judge(res["content"][0])
+            outofdate = Judge("post",res["content"][0])
             if(outofdate):
                 oodflag = 1
                 pass
@@ -145,7 +150,7 @@ def computeMatchUsers(uid, pid, mydb):
 
     if(res["status"] != 0):
         if(res["status"] == 1):
-            outofdate = Judge(res["content"][0])
+            outofdate = Judge("user",res["content"][0])
             if(outofdate):
                 oodflag = 1
                 pass
