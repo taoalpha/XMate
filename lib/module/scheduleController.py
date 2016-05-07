@@ -2,11 +2,10 @@
 FIELD = {
     "_id":"",
     "type":"",
-    "latitude":"",
-    "longitude":"",
-    "start_time":"",
-    "end_time":"",
-    "post_time":"",
+    "latitude":123123.12,
+    "longitude":123123.12,
+    "start_time":123812938.12,
+    "end_time":16253724.2,
     "owner":"",
     "member":[]
 }
@@ -78,6 +77,11 @@ def postData(request,res,db):
         data[key] = request.form[key]
 
     data["created_time"] = moment.now().epoch()
+    data["end_time"] = float(data["end_time"])
+    data["start_time"] = float(data["start_time"])
+    data["longitude"] = float(data["longitude"])
+    data["latitude"] = float(data["latitude"])
+
     res = db.insertData("schedule",[data])
     if (res["status"] != 1):
         return res
