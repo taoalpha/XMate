@@ -113,6 +113,7 @@ def computeMatchPosts(post_content, mydb):
 
     #Insert the data into the cache
     current_time = moment.now().epoch()
+
     data_list = []
     data = {"_id":search_id, "match_list":docu_list, "create_time":current_time}
     data_list.append(data)
@@ -197,7 +198,11 @@ def computeMatchUsers(uid, pid, mydb):
         if(res["status"] != 1):
             return res
         cursor = list(res["content"])
-        ranlist = random.sample(cursor,5)
+        tmplist = random.sample(cursor,5)
+        ranlist = []
+
+        for doc in tmplist:
+            ranlist.append(doc["_id"])
         recommend_user_list += ranlist
 
     #get the user name from the recommended list

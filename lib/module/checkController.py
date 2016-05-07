@@ -5,76 +5,86 @@ import moment
 
 # check message and get rid of all outdated messages
 
-def returnHelper(status = 0, msg = None,content = None):
+def returnHelper(status = 1, msg = None,content = None):
     return_val = {}
     return_val["status"] = status
     return_val["msg"] = msg
-    return_val["content"] = str(content)
+    return_val["content"] = content
 
     return return_val
+
+def checkCache(mydb):
+    id_list = []
+    res = mydb.getData("cache", id_list)
+    if(res["status"] != 1):
+        return res
+    cursor = res["content"]
+
+    outoftime_cache = []
+    current_time = moment.now().epoch()
+    for doc  in cursor:
+        if(doc["create_time"] < current_time - 86400)
+            outoftime_cache.append(doc["_id"])
+
+    id_list = outoftime_cache
+    res = mydb.removeData("cache", id_list)
+    if(res["status"] != 1):
+        return res
+
+    return returnHelper()
+
 
 
 
 def checkMsg(mydb):
 
-    res = mydb.selectCollection("xmateMessage")
-    if(res["status"]):
+    #get all messages and check the out of time message
+    id_list = []
+    res = mydb.getData("message", id_list)
+    if(res["status"] != 1):
         return res
+    cursor = res["content"]
 
-    #find out of date messages(more than 24hr)
+    outoftime_msg = []
+    related_user = {}
     current_time = moment.now().epoch()
     st = current_time - 86400
-    match_list = {"create_time":{"$lt":st}}
-    res = mydb.getData(match_list)
-    if(res["status"]):
-        return res
-    cursor = list(res["content"])
-    #delete out of date msg_ids in users' unprocessed msg list
-    user_msg = {}
-    outoftime_msg = []
-    related_userlist = set()
 
-    if(len(cursor) == 0):
-        return returnHelper()
     for msg in cursor:
-        outoftime_msg.append(msg["_id"])
-        related_userlist.add(msg["receiver_id"])
-        if(msg["receiver_id"] in user_msg.keys()):
-            pass
-        else:
-            user_msg[msg["receiver_id"]] = []
-        user_msg[msg["receiver_id"]].append(msg["_id"])
-    related_userlist = list(related_userlist)
+        if(msg["create_time"] < st):
+            outoftime_msg.append(doc["_id"])
+            if(msg["receiver_id"] in related_user.keys()):
+                pass
+            else:
+                related_user[msg["receiver_id"]] = []
+            related_user[msg["receiver_id"]].append(msg["_id"])
+    if(len(outoftime_msg) == 0):
+        return returnHelper()
 
-    res = mydb.selectCollection("xmateUser")
-    if(res["status"]):
+    #update users' unprocessed msg list by removing the out of date msgs
+    id_list = related_user.keys()
+    res = mydb.getData("user",id_list)
+    if(res["status"] != 1):
         return res
-    match_list = {"_id": {"$in": related_userlist}}
-    res = mydb.getData(match_list)
-    if(res["status"]):
+    cursor = res["content"]
+
+    id_list = []
+    data_list = []
+    for user in cursor:
+        for msg_id in related_user[user["_id"]]:
+            if(msg_id in user["unprocessed_message"]):
+                user["unprocessed_message"].remove(msg_id)
+        id_list.append(user["_id"])
+        data_list.append(user)
+    res = mydb.updateData("user",id_list, data_list)
+    if(res["status"] != 1):
         return res
-    cursor =  res["content"]
 
-    for users in cursor:
-        uid = users["_id"]
-        nlist = users["unprocessed_message"]
-        for mid in user_msg[uid]:
-            if(mid in nlist):
-                nlist.remove(mid)
 
-        match_list = {"_id":uid}
-        ndata = {"unprocessed_message":nlist}
-        res = mydb.updateData(match_list,ndata)
-        if(res["status"]):
-            return res
-
-    #delete the messages in database
-    res = mydb.selectCollection("xmateMessage")
-    if(res["status"]):
-        return res
-    match_list = {"_id": {"$in": outoftime_msg}}
-    res = mydb.removeData(match_list)
-    if(res["status"]):
+    #delete the out of time messages in database
+    id_list = outoftime_msg
+    res = mydb.removeData("message", id_list)
+    if(res["status"] != 1):
         return res
 
     return returnHelper()
@@ -166,51 +176,6 @@ def checkSchedule(db):
         '''
 
     return returnHelper()
-
-def updateUserHistoryPartner(schedule, db):
-    '''
-    Update everyone's historypartner field
-    '''
-    res = db.selectCollection("xmateUser")
-    # handle db err
-    if res["status"]:
-        return res
-
-    # get the member list
-    user_list = schedule["member"]
-    user_list.append(schedule["owner"])
-    uids = list(set(user_list))
-
-    for uid in uids:
-        match_list = {"_id": uid}
-        res = db.getData( match_list )
-        # handle db err
-        if res["status"]:
-            return res
-
-        match_res = list(res["content"])
-
-        print "#################### number of history partner:"
-        print len(match_res)
-        if len(match_res) > 0:
-            # if exist
-            history_partner = match_res[0]["history_partner"]
-            history_partner.extend(uids)
-            print "############HISTORY PARTNER########"
-            print history_partner
-            print "############HISTORY PARTNER########"
-            # update the history_events
-            print "update the history partner"
-            res = db.updateData( match_list , {"history_partner":list(set(history_partner))} )
-            # handle db err
-            if res["status"]:
-                return res
-            # if nothing wrong, remove it from current schedule_list
-
-    # if nothing wrong happened
-    res["status"] = 0
-    return res
-
 
 
 def updateUserScheduleList(schedule,db):
@@ -439,55 +404,3 @@ def updateUserUnprocessedList(uid,mid,db):
 
 
 
-def removeFromPost(schedule,db):
-    '''
-    Remove it from current post collection
-    '''
-    res = db.selectCollection("xmatePost")
-    # handle db err
-    if res["status"]:
-        return res
-
-    print "remove from the post"
-    res = db.removeData( { "_id": schedule["_id"] } )
-    # handle db err
-    if res["status"]:
-        return res
-
-    # if nothing wrong happened
-    res["status"] = 0
-    return res
-
-
-
-
-def moveToHistoryPost(schedule,db):
-    '''
-    Insert the schedule to history post collection
-    '''
-    print "entering moving to history"
-    res = db.selectCollection("xmateHistoryPost")
-    # handle db err
-    if res["status"]:
-        return res
-
-    res = db.getData( { "_id": schedule["_id"] } )
-    # handle db err
-    if res["status"]:
-        return res
-
-    if len(list(res["content"])) == 0:
-        # not exist
-        print "not exist, will move to history"
-        res = db.insertData(schedule)
-        # handle db err
-        if res["status"]:
-            return res
-        '''
-        '''
-    else:
-        print "exist, do nothing"
-
-    # if nothing wrong happened
-    res["status"] = 0
-    return res
