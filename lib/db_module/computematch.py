@@ -25,7 +25,7 @@ def Judge(type,cache_return):
     current_time = moment.now().epoch()
 
     threshold = 3600
-    if(type == "post")
+    if(type == "post"):
         threshold = 7200
 
     if(t < current_time - threshold):
@@ -218,6 +218,7 @@ def computeMatchUsers(uid, pid, mydb):
     
     id_list = recommend_user_list
     res = mydb.getData("user",id_list)
+
     if(res["status"] != 1):
         return res
     
@@ -229,15 +230,17 @@ def computeMatchUsers(uid, pid, mydb):
     #insert or update data into cache
     current_time = moment.now().epoch()
     data_list = []
-    data = {"_id":mactch_id, "match_list":r_list, "create_time":current_time}
+    data = {"_id":match_id, "match_list":r_list, "create_time":current_time}
     data_list.append(data)
-    
+
     if(oodflag == 0):
+	print "a"
         res = mydb.insertData("cache",data_list)
+	print res
         if(res["status"] != 1):
             return res
     else:
-        id_list = [mactch_id]
+        id_list = [match_id]
         res = mydb.updateData("cache",id_list,data_list)
         if(res["status"] != 1):
             return res
