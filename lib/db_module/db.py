@@ -143,6 +143,7 @@ class CDatabase:
         '''
         if len(id_list) == 0:
             # get all
+            print "#getting all"
             try:
                 if type == "user":
                     d = json.loads(self.rpc.getAllUsers())

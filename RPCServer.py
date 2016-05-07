@@ -4,6 +4,7 @@ clr.AddReference('Vsync') # The profile of the dll file.
 import Vsync
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
+import json
 
 #from threading import Thread
 
@@ -280,28 +281,28 @@ def getAllUsers_api():
             Retrieve all users, including all keys and values.
             @return {string} - return stringify content of users
 	"""
-        return str(users)
+        return json.dumps(users)
 
 def getAllMessages_api():
 	"""
             Retrieve all messages, including all keys and values.
             @return {string} - return stringify content of users
 	"""
-        return str(messages)
+        return json.dumps(messages)
 
 def getAllCache_api():
 	"""
             Retrieve all cache, including all keys and values.
             @return {string} - return stringify content of users
 	"""
-        return str(cache)
+        return json.dumps(cache)
 
 def getAllSchedules_api():
 	"""
             Retrieve all schedules including all keys and values.
             @return {string} - return stringify content of users
 	"""
-        return str(schedules)
+        return json.dumps(schedules)
 
 
 

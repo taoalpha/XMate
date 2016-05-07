@@ -63,12 +63,13 @@ def postData(request,res,db):
             1. fail to insert data
     '''
 
-    # if request for matching, then forward to it
-    if request.form["action"] == "match":
-        return getMatch(request.form["_id"])
-    # if request for searching, then forward to it
-    if request.form["action"] == "search":
-        return getMatch(request.form)
+    if "action" in request.form:
+        # if request for matching, then forward to it
+        if request.form["action"] == "match":
+            return getMatch(request.form["_id"])
+        # if request for searching, then forward to it
+        if request.form["action"] == "search":
+            return getMatch(request.form)
 
     # normal requests
     data = FIELD;
