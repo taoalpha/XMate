@@ -64,7 +64,7 @@ def rpc(mid,action):
 
 @app.route("/test",methods=["GET"])
 def test():
-    return jsonify(db.getData("user",[]))
+    return jsonify(db.getData("cache",[]))
 
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0')

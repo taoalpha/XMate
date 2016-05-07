@@ -21,11 +21,11 @@ def getHash(post_content):
     return hashlib.md5(strhash).hexdigest()
 
 def Judge(type,cache_return):
-    t = chache_return["create_time"]
+    t = cache_return["create_time"]
     current_time = moment.now().epoch()
 
     threshold = 3600
-    if(type == "post")
+    if(type == "post"):
         threshold = 7200
 
     if(t < current_time - threshold):
@@ -38,7 +38,7 @@ def computeMatchPosts(post_content, mydb):
 
     dis_threshold = 9.0
     docu_list = []
-    ood_flag = 0
+    oodflag = 0
 
     #if the search has already been cached, return it
     search_id = getHash(post_content)
@@ -69,6 +69,7 @@ def computeMatchPosts(post_content, mydb):
     if(post_content["latitude"] == ""):
         f2 = False
 
+    print "######"
     #Find the match document list
     for doc in cursor:
 
@@ -85,18 +86,20 @@ def computeMatchPosts(post_content, mydb):
                 nst = moment.date(st.year, st.month, st.day, 0).epoch()
                 
                 if(doc["start_time"] > nst - 86400 and doc["start_time"] < nst + 86400*1.5):
-                    doc["timediff"] = abs(doc["start_time"] - st)
+                    doc["time_diff"] = abs(doc["start_time"] - post_content["start_time"])
                 else:
                     flag = False
         else:
             flag = False
+
         if(flag):
+	    print doc
             if(post_content["latitude"] == ""):
                 pass
             else:
                 pointa = (doc["latitude"],doc["longitude"])
                 pointb = (post_content["latitude"],post_content["longitude"])
-                dist = vincenty(loca, locb).miles
+                dist = vincenty(pointa, pointb).miles
                 if(dist < dis_threshold):
                     doc["diff"] = dist
                 else:
@@ -218,6 +221,7 @@ def computeMatchUsers(uid, pid, mydb):
     
     id_list = recommend_user_list
     res = mydb.getData("user",id_list)
+
     if(res["status"] != 1):
         return res
     
@@ -229,15 +233,17 @@ def computeMatchUsers(uid, pid, mydb):
     #insert or update data into cache
     current_time = moment.now().epoch()
     data_list = []
-    data = {"_id":mactch_id, "match_list":r_list, "create_time":current_time}
+    data = {"_id":match_id, "match_list":r_list, "create_time":current_time}
     data_list.append(data)
-    
+
     if(oodflag == 0):
+	print "a"
         res = mydb.insertData("cache",data_list)
+	print res
         if(res["status"] != 1):
             return res
     else:
-        id_list = [mactch_id]
+        id_list = [match_id]
         res = mydb.updateData("cache",id_list,data_list)
         if(res["status"] != 1):
             return res

@@ -213,27 +213,27 @@ def removeScheduleData_api(id):
 """
     Cache DHT - Define cache collection (cache_id - '{time:"1231231212.123",id_list:"[]"}'
 """
-def postCacheData_api(id, cache):
+def postCacheData_api(id, cache_content):
 	"""
             Forward cache POST to vsync
             @param {string} id - cache id
             @param {string} cache - cache content
 	"""
         # delegate to vsync
-	group.Send(9, id, cache)
+	group.Send(9, id, cache_content)
         # just for flask
 	return "cache"
 
 
-def postCacheData(id, cache):
+def postCacheData(id, cache_content):
         '''
             add a cache to Cache DHT with given id.
             @param {string} id - cache id
             @param {string} cache - cache content
         '''
-	cache[id] = cache
+	cache[id] = cache_content
         # for debugging
-        if cache == "-1":
+        if cache_content == "-1":
             print "Delete the user with id :"+id
         else:
             print "Add the user with id :"+id
@@ -258,11 +258,11 @@ def getCacheData(id):
             get a schedule from the schedule DHT with the given id.
             @param {string} id - cache id
         '''
-	if id in schedules:
-		group.Reply(schedules[id])
+	if id in cache:
+		group.Reply(cache[id])
 	else:
 		group.Reply(-1)
-	print("Vsync server getScheduleData with id=" + id.ToString())
+	print("Vsync server get Cache with id=" + id.ToString())
 
 def removeCacheData_api(id):
 	"""
