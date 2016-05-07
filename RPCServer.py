@@ -190,8 +190,6 @@ def getScheduleData_api(id):
 			return ele
 	return "-1"
 
-
-
 def getScheduleData(id):
         '''
             get a schedule from the schedule DHT with the given id.
@@ -267,13 +265,43 @@ def getCacheData(id):
 
 def removeCacheData_api(id):
 	"""
-            Forward cache DELETE to vsync, remvoe the cache = set the value for this key(id) as -1.
+            Forward cache DELETE to vsync, remove the cache = set the value for this key(id) as [], empty list.
             @param {string} id - cache id
             @return {string} useless for now
 	"""
         # delegate to vsync
 	group.Send(9, id, '-1')
 	return "cache"
+
+
+# for retrieving all user / message / schedule
+def getAllUsers_api():
+	"""
+            Retrieve all users, including all keys and values.
+            @return {string} - return stringify content of users
+	"""
+        return str(users)
+
+def getAllMessages_api():
+	"""
+            Retrieve all messages, including all keys and values.
+            @return {string} - return stringify content of users
+	"""
+        return str(messages)
+
+def getAllCache_api():
+	"""
+            Retrieve all cache, including all keys and values.
+            @return {string} - return stringify content of users
+	"""
+        return str(cache)
+
+def getAllSchedules_api():
+	"""
+            Retrieve all schedules including all keys and values.
+            @return {string} - return stringify content of users
+	"""
+        return str(schedules)
 
 
 
@@ -307,6 +335,11 @@ server.register_function(removeMessageData_api,'removeMessageData')
 server.register_function(postCacheData_api,'postCacheData')
 server.register_function(getCacheData_api,'getCacheData')
 server.register_function(removeCacheData_api,'removeCacheData')
+# retrieve all
+server.register_function(getAllUsers_api,'getAllUsers')
+server.register_function(getAllSchedules_api,'getAllSchedules')
+server.register_function(getAllMessages_api,'getAllMessages')
+server.register_function(getAllCache_api,'getAllCache')
 # view
 server.register_function(myViewFunc,'myViewFunc')
 

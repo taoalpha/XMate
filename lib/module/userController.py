@@ -104,7 +104,6 @@ FIELDS = {
     "weight" : "",
     "schedule_list" : [],
     "conflict_list" : [],
-    "history_partner" : [],
     "history_events" : [],
     "unprocessed_message" : []
 }

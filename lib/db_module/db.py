@@ -106,6 +106,9 @@ class CDatabase:
                     self.rpc.postMessageData(id,data_to_string)
                     data["_id"] = id
                     content.append(data)
+                elif type == "cache":
+                    self.rpc.postCacheData(id,data_to_string)
+                    content.append(data)
                 else:
                     return self.returnHelper(3, "invalid type")
             return self.returnHelper(1, "", content)
@@ -138,6 +141,27 @@ class CDatabase:
             Ret:
                 return the matched documents list
         '''
+        if len(id_list) == 0:
+            # get all
+            try:
+                if type == "user":
+                    d = json.loads(self.rpc.getAllUsers())
+                    content = {k:v for k,v in d.iteritems() if v != "-1"}
+                elif type == "message":
+                    d = json.loads(self.rpc.getAllMessages())
+                    content = {k:v for k,v in d.iteritems() if v != "-1"}
+                elif type == "schedule":
+                    d = json.loads(self.rpc.getAllSchedules())
+                    content = {k:v for k,v in d.iteritems() if v != "-1"}
+                elif type == "cache":
+                    d = json.loads(self.rpc.getAllCache())
+                    content = {k:v for k,v in d.iteritems() if v != "-1"}
+                else:
+                    return self.returnHelper(3, "invalid type")
+                return self.returnHelper(1, "", content)
+            except:
+                return self.returnHelper(2,"Failed to get from rpc")
+
         content = []
         try:
             if type == "user":
@@ -151,7 +175,10 @@ class CDatabase:
             elif type == "message":
                 for i in id_list:
                     content.append(json.loads(self.rpc.getMessageData(i)))
-
+                return self.returnHelper(1, "", content)
+            elif type == "cache":
+                for i in id_list:
+                    content.append(json.loads(self.rpc.getCacheData(i)))
                 return self.returnHelper(1, "", content)
             else:
                 return self.returnHelper(3, "invalid type")
@@ -202,6 +229,9 @@ class CDatabase:
                     content.append(res)
                 elif type == 'user':
                     res = self.rpc.removeUserData(id_list[i])
+                    content.append(res)
+                elif type == 'cache':
+                    res = self.rpc.removeCacheData(id_list[i])
                     content.append(res)
 
             return self.returnHelper(1, "", content)

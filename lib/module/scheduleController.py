@@ -50,6 +50,7 @@ def putData(request,res,db):
     res = db.updateData("schedule",[res["_id"]],[data])
 
     return res
+
 def postData(request,res,db):
     '''
         Desc:
@@ -61,6 +62,15 @@ def postData(request,res,db):
         Err:
             1. fail to insert data
     '''
+
+    # if request for matching, then forward to it
+    if request.form["action"] == "match":
+        return getMatch(request.form["_id"])
+    # if request for searching, then forward to it
+    if request.form["action"] == "search":
+        return getMatch(request.form)
+
+    # normal requests
     data = FIELD;
     # if request.form is a validate dictionary, may ignore this part
     for key in request.form:
@@ -85,6 +95,36 @@ def postData(request,res,db):
         return userRes
 
     return res
+
+# special for get match and get search
+def getMatch(pid):
+    '''
+        Desc:
+            Get the match list of a list
+        Args:
+            post_id: which post we want to get the match list (of users)
+    '''
+    res = CM.getMatch(pid)
+    if res["status"] != 1:
+        return res
+    return res["content"]
+
+def getSearch(form):
+    '''
+        Desc:
+            Get the search result
+        Args:
+            form.start_time
+            form.end_time
+            form.type
+            form.latitude
+            form.longitude
+            form.uid
+    '''
+    res = CM.getSearch(form)
+    if res["status"] != 1:
+        return res
+    return res["content"]
 
 # define the getData function
 def getData(request,res,db):
