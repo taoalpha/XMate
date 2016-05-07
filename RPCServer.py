@@ -2,92 +2,127 @@ from System import Action
 import clr
 clr.AddReference('Vsync') # The profile of the dll file.
 import Vsync
+from SimpleXMLRPCServer import SimpleXMLRPCServer
+from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
+import json
 
 #from threading import Thread
 
 Vsync.VsyncSystem.Start()
 
 
-from SimpleXMLRPCServer import SimpleXMLRPCServer
-from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
-
+# define RequestHandler
 class RequestHandler(SimpleXMLRPCRequestHandler):
     rpc_paths = ('/RPC2',)
 
+# define the server for later use
 server = SimpleXMLRPCServer(("localhost", 8000),requestHandler=RequestHandler)
 server.register_introspection_functions()
 
 group = Vsync.Group("Master")
+
 print "Created Master group"
 users = {}
 schedules = {}
 messages = {}
+cache = {}
 
 
-""" User DHT
+"""
+    User DHT
 """
 def postUserData_api(id, profile):
-	"""add a profile with id to the users DHT.
-		id and profile are both string.
 	"""
+            Forward user POST to vsync
+            @param {string} id - user id
+            @param {string} profile - stringified user profile
+	"""
+        # delegate to vsync
 	group.Send(0, id, profile)
+
 	return "profile" # just for flask
-server.register_function(postUserData_api,'postUserData')
 
 def postUserData(id, profile):
+        '''
+            add a profile with id to the users DHT.
+            @param {string} id - user id
+            @param {string} profile - stringified user profile
+        '''
 	users[id] = profile
-	print("Vsync server postUserData with id=" + id.ToString())
+
+        # for debugging
+        if profile == "-1":
+            print "Delete the user with id :"+id
+        else:
+            print "Add the user with id :"+id
 
 def getUserData_api(id):
-	"""get a user profile from the user DHT with the given id.
-		id is a string, and the functions return a string unless no macthing found.
+	"""
+            Forward user GET to vsync
+            @param {string} id - user id
+            @return {string} - either return the profile content or -1 for not found / deleted
 	"""
 	res = []
-	print(res)
+        # delegate to vsync
 	nr = group.Query(Vsync.Group.ALL, 1, id, Vsync.EOLMarker(), res)
 	for ele in res:
 		if (ele != -1):
 			return ele
 	return "-1"
-server.register_function(getUserData_api, 'getUserData')
 
 def getUserData(id):
+        '''
+            get a user profile from the user DHT with the given id.
+            @param {string} id - user id
+        '''
 	if id in users:
 		group.Reply(users[id])
 	else:
 		group.Reply(-1)
-	print("Vsync server getUserData with id=" + id.ToString())
+        print("Get user with id :" + id)
 
 def removeUserData_api(id):
-	"""set a user profile to be "" in the user DHT with the given id.
-		id is a string.
 	"""
+            Forward user DELETE to vsync
+            @param {string} id - user id
+	"""
+        # delegate to vsync post
 	group.Send(0, id, '-1')
 	return "profile" # just for flask
-server.register_function(removeUserData_api,'removeUserData')
-
-def removeUserData(id):
-	users[id] = ""
-	print("Vsync server removeUserData with id=" + id.ToString())
 
 
-""" Message DHT
+"""
+Message DHT
 """
 def postMessageData_api(id, message):
-	"""add a message with id to the message DHT.
-		id and message are both string.
 	"""
+            Forward a message POST to vsync.
+            @param {string} id - message id
+            @param {string} message - message content
+	"""
+        # delegate to vsync
 	group.Send(3, id, message)
 	return "message" # just for flask
-server.register_function(postMessageData_api,'postMessageData')
 
 def postMessageData(id, message):
+        '''
+            Add a message to message DHT with a id.
+            @param {string} id - message id
+            @param {string} message - message content
+        '''
+
 	messages[id] = message
-	print("Vsync server postMessageData with id=" + id.ToString())
+        # for debugging
+        if message == "-1":
+            print "Delete the message with id :"+id
+        else:
+            print "Add the message with id :"+id
 
 def getMessageData_api(id):
-	"""get a message from the message DHT with the given id.
-		id is a string, and the functions return a string unless no macthing found.
+	"""
+            Forward message GET to vsync.
+            @param {string} id - message id
+            @return {string} - either return the message content or -1 for not found / deleted
 	"""
 	res = []
 	nr = group.Query(Vsync.Group.ALL, 4, id, Vsync.EOLMarker(), res)
@@ -95,9 +130,12 @@ def getMessageData_api(id):
 		if (ele != -1):
 			return ele
 	return "-1"
-server.register_function(getMessageData_api,'getMessageData')
 
 def getMessageData(id):
+        '''
+            get a message from the message DHT with the given id.
+            @param {string} id - message id
+        '''
 	if id in messages:
 		group.Reply(messages[id])
 	else:
@@ -105,34 +143,46 @@ def getMessageData(id):
 	print("Vsync server getMessageData with id=" + id.ToString())
 
 def removeMessageData_api(id):
-	"""set a message to be "" in the message DHT with the given id.
-		id is a string.
+	"""
+            Forward message DELETE to user.
+            @param {string} id - message id
 	"""
 	group.Send(3, id, '-1')
 	return "message" # just for flask
-server.register_function(removeMessageData_api,'removeMessageData')
 
-def removeMessageData(id):
-	messages[id] = ""
-	print("Vsync server removeMessageData with id=" + id.ToString())
 
-""" Schedule DHT
+"""
+    Schedule DHT
 """
 def postScheduleData_api(id, schedule):
-	"""add a schedule with id to the schedule DHT.
-		id and schedule are both string
+	"""
+            Forward schedule POST to vsync
+            @param {string} id - schedule id
+            @param {string} schedule - schedule content
 	"""
 	group.Send(6, id, schedule)
 	return "schedule" # just for flask
-server.register_function(postScheduleData_api,'postScheduleData')
+
 
 def postScheduleData(id, schedule):
+        '''
+            add a schedule with id to the schedule DHT.
+            @param {string} id - schedule id
+            @param {string} schedule - schedule content
+        '''
+        # for debugging
+        if schedule == "-1":
+            print "Delete the schedule with id :"+id
+        else:
+            print "Add the schedule with id :"+id
+
 	schedules[id] = schedule
-	print("Vsync server postScheduleData with id=" + id.ToString())
 
 def getScheduleData_api(id):
-	"""get a schedule from the schedule DHT with the given id.
-		id is a string, and the functions return a string unless no macthing found.
+	"""
+            Forward schedule GET to vsync
+            @param {string} id - schedule id
+            @return {string} - either return schedule content or -1 if not found / deleted
 	"""
 	res = []
 	nr = group.Query(Vsync.Group.ALL, 7, id, Vsync.EOLMarker(), res)
@@ -140,9 +190,12 @@ def getScheduleData_api(id):
 		if (ele != -1):
 			return ele
 	return "-1"
-server.register_function(getScheduleData_api,'getScheduleData')
 
 def getScheduleData(id):
+        '''
+            get a schedule from the schedule DHT with the given id.
+            @param {string} id - schedule id
+        '''
 	if id in schedules:
 		group.Reply(schedules[id])
 	else:
@@ -150,16 +203,108 @@ def getScheduleData(id):
 	print("Vsync server getScheduleData with id=" + id.ToString())
 
 def removeScheduleData_api(id):
-	"""set a schedule to be "" in the schedule DHT with the given id.
-		id is a string.
+	"""
+            Forward schedule DELETE to vsync POST with content as -1.
+            @param {string} id - schedule id
 	"""
 	group.Send(6, id, '-1')
 	return "profile"
-server.register_function(removeScheduleData_api,'removeScheduleData')
 
-def removeScheduleData(id):
-	schedules[id] = ""
-	print("Vsync server removeScheduleData with id=" + id.ToString())
+"""
+    Cache DHT - Define cache collection (cache_id - '{time:"1231231212.123",id_list:"[]"}'
+"""
+def postCacheData_api(id, cache):
+	"""
+            Forward cache POST to vsync
+            @param {string} id - cache id
+            @param {string} cache - cache content
+	"""
+        # delegate to vsync
+	group.Send(9, id, cache)
+        # just for flask
+	return "cache"
+
+
+def postCacheData(id, cache):
+        '''
+            add a cache to Cache DHT with given id.
+            @param {string} id - cache id
+            @param {string} cache - cache content
+        '''
+	cache[id] = cache
+        # for debugging
+        if cache == "-1":
+            print "Delete the user with id :"+id
+        else:
+            print "Add the user with id :"+id
+
+
+def getCacheData_api(id):
+	"""
+            Forward cache GET to vsync.
+            @param {string} id - cache id
+            @return {string} either return the found cache content or -1 represent not found / deleted
+	"""
+	res = []
+	nr = group.Query(Vsync.Group.ALL, 10, id, Vsync.EOLMarker(), res)
+	for ele in res:
+		if (ele != -1):
+			return ele
+	return "-1"
+
+
+def getCacheData(id):
+        '''
+            get a schedule from the schedule DHT with the given id.
+            @param {string} id - cache id
+        '''
+	if id in schedules:
+		group.Reply(schedules[id])
+	else:
+		group.Reply(-1)
+	print("Vsync server getScheduleData with id=" + id.ToString())
+
+def removeCacheData_api(id):
+	"""
+            Forward cache DELETE to vsync, remove the cache = set the value for this key(id) as [], empty list.
+            @param {string} id - cache id
+            @return {string} useless for now
+	"""
+        # delegate to vsync
+	group.Send(9, id, '-1')
+	return "cache"
+
+
+# for retrieving all user / message / schedule
+def getAllUsers_api():
+	"""
+            Retrieve all users, including all keys and values.
+            @return {string} - return stringify content of users
+	"""
+        return json.dumps(users)
+
+def getAllMessages_api():
+	"""
+            Retrieve all messages, including all keys and values.
+            @return {string} - return stringify content of users
+	"""
+        return json.dumps(messages)
+
+def getAllCache_api():
+	"""
+            Retrieve all cache, including all keys and values.
+            @return {string} - return stringify content of users
+	"""
+        return json.dumps(cache)
+
+def getAllSchedules_api():
+	"""
+            Retrieve all schedules including all keys and values.
+            @return {string} - return stringify content of users
+	"""
+        return json.dumps(schedules)
+
+
 
 ### Vsycn register
 def myViewFunc(v):
@@ -170,24 +315,61 @@ def myViewFunc(v):
     for a in v.leavers:
         print('  Leaving: ' + a.ToString() + ', isMyAddress='+a.isMyAddress().ToString())
     return
+
+
+
+# All functions registered by rpc-server
+
+# user related functions
+server.register_function(postUserData_api,'postUserData')
+server.register_function(getUserData_api, 'getUserData')
+server.register_function(removeUserData_api,'removeUserData')
+# schedule related functions
+server.register_function(postScheduleData_api,'postScheduleData')
+server.register_function(getScheduleData_api,'getScheduleData')
+server.register_function(removeScheduleData_api,'removeScheduleData')
+# message related functions
+server.register_function(postMessageData_api,'postMessageData')
+server.register_function(getMessageData_api,'getMessageData')
+server.register_function(removeMessageData_api,'removeMessageData')
+# cache related functions
+server.register_function(postCacheData_api,'postCacheData')
+server.register_function(getCacheData_api,'getCacheData')
+server.register_function(removeCacheData_api,'removeCacheData')
+# retrieve all
+server.register_function(getAllUsers_api,'getAllUsers')
+server.register_function(getAllSchedules_api,'getAllSchedules')
+server.register_function(getAllMessages_api,'getAllMessages')
+server.register_function(getAllCache_api,'getAllCache')
+# view
 server.register_function(myViewFunc,'myViewFunc')
 
-print "defined functions"
 
-# register functiosn in Vysnc
+# All functions registered by vsync
+
+# user related functions
 group.RegisterHandler(0, Action[str, str](postUserData))
 group.RegisterHandler(1, Action[str](getUserData))
-group.RegisterHandler(2, Action[str](removeUserData))
+# group.RegisterHandler(2, Action[str](removeUserData))
 
+# message related functions
 group.RegisterHandler(3, Action[str, str](postMessageData))
 group.RegisterHandler(4, Action[str](getMessageData))
-group.RegisterHandler(5, Action[str](removeMessageData))
+# group.RegisterHandler(5, Action[str](removeMessageData))
 
+# schedule related functions
 group.RegisterHandler(6, Action[str, str](postScheduleData))
 group.RegisterHandler(7, Action[str](getScheduleData))
-group.RegisterHandler(8, Action[str](removeScheduleData))
+# group.RegisterHandler(8, Action[str](removeScheduleData))
 
+# cache related functions
+group.RegisterHandler(9, Action[str, str](postCacheData))
+group.RegisterHandler(10, Action[str](getCacheData))
+# group.RegisterHandler(11, Action[str](removeCacheData))
+
+# view
 group.RegisterViewHandler(Vsync.ViewHandler(myViewFunc))
+
 group.Join()
 
 ### run
