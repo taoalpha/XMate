@@ -62,7 +62,7 @@ def rpc(mid,action):
     s.addUser(1,"fuck vysnc")
     return jsonify({"hello":s.getProfile(1)})
 
-@app.route("/test",defaults={'type':"user"}methods=["GET"])
+@app.route("/test",defaults={'type':"user"},methods=["GET"])
 @app.route('/test/<mid>', methods=['DELETE','GET','POST','PUT'])
 def test(mid):
     return jsonify(db.getData(mid,[]))
