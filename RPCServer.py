@@ -262,7 +262,7 @@ def getCacheData(id):
 		group.Reply(cache[id])
 	else:
 		group.Reply(-1)
-	print("Vsync server getScheduleData with id=" + id.ToString())
+	print("Vsync server get Cache with id=" + id.ToString())
 
 def removeCacheData_api(id):
 	"""
