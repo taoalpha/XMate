@@ -66,10 +66,10 @@ def postData(request,res,db):
     if "action" in request.form:
         # if request for matching, then forward to it
         if request.form["action"] == "match":
-            return getMatch(request.form["_id"])
+            return getMatch(request.form["uid"],request.form['pid'],db)
         # if request for searching, then forward to it
         if request.form["action"] == "search":
-            return getMatch(request.form)
+            return getMatch(request.form,db)
 
     # normal requests
     data = FIELD;
@@ -98,14 +98,14 @@ def postData(request,res,db):
     return res
 
 # special for get match and get search
-def getMatch(pid):
+def getMatch(uid,pid,db):
     '''
         Desc:
             Get the match list of a list
         Args:
             post_id: which post we want to get the match list (of users)
     '''
-    res = CM.getMatch(pid)
+    res = CM.computeMatchUsers(uid,pid,db)
     if res["status"] != 1:
         return res
     return res["content"]
@@ -122,7 +122,7 @@ def getSearch(form):
             form.longitude
             form.uid
     '''
-    res = CM.getSearch(form)
+    res = CM.computeMatchPosts(form,db)
     if res["status"] != 1:
         return res
     return res["content"]
