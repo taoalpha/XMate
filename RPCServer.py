@@ -62,13 +62,16 @@ def getUserData_api(id):
             @param {string} id - user id
             @return {string} - either return the profile content or -1 for not found / deleted
 	"""
-	res = []
-        # delegate to vsync
-	nr = group.Query(Vsync.Group.ALL, 1, id, Vsync.EOLMarker(), res)
-	for ele in res:
-		if (ele != -1):
-			return ele
+	if id in users and users[id] != "-1":
+		return users[id]
 	return "-1"
+	# res = []
+        # # delegate to vsync
+	# nr = group.Query(Vsync.Group.ALL, 1, id, Vsync.EOLMarker(), res)
+	# for ele in res:
+	# 	if (ele != -1):
+	# 		return ele
+	# return "-1"
 
 def getUserData(id):
         '''
@@ -124,12 +127,16 @@ def getMessageData_api(id):
             @param {string} id - message id
             @return {string} - either return the message content or -1 for not found / deleted
 	"""
-	res = []
-	nr = group.Query(Vsync.Group.ALL, 4, id, Vsync.EOLMarker(), res)
-	for ele in res:
-		if (ele != -1):
-			return ele
+	if id in messages and messages[id] != "-1":
+		return messages[id]
 	return "-1"
+
+	# res = []
+	# nr = group.Query(Vsync.Group.ALL, 4, id, Vsync.EOLMarker(), res)
+	# for ele in res:
+	# 	if (ele != -1):
+	# 		return ele
+	# return "-1"
 
 def getMessageData(id):
         '''
@@ -184,12 +191,16 @@ def getScheduleData_api(id):
             @param {string} id - schedule id
             @return {string} - either return schedule content or -1 if not found / deleted
 	"""
-	res = []
-	nr = group.Query(Vsync.Group.ALL, 7, id, Vsync.EOLMarker(), res)
-	for ele in res:
-		if (ele != -1):
-			return ele
+	if id in schedules and schedules[id] != "-1":
+		return schedules[id]
 	return "-1"
+
+	# res = []
+	# nr = group.Query(Vsync.Group.ALL, 7, id, Vsync.EOLMarker(), res)
+	# for ele in res:
+	# 	if (ele != -1):
+	# 		return ele
+	# return "-1"
 
 def getScheduleData(id):
         '''
