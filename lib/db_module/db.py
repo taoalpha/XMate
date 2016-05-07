@@ -146,16 +146,16 @@ class CDatabase:
             try:
                 if type == "user":
                     d = json.loads(self.rpc.getAllUsers())
-                    content = {k:json.loads(v) for k,v in d.iteritems() if v != "-1"}
+                    content = [json.loads(v) for k,v in d.iteritems() if v != "-1"]
                 elif type == "message":
                     d = json.loads(self.rpc.getAllMessages())
-                    content = {k:json.loads(v) for k,v in d.iteritems() if v != "-1"}
+                    content = [json.loads(v) for k,v in d.iteritems() if v != "-1"]
                 elif type == "schedule":
                     d = json.loads(self.rpc.getAllSchedules())
-                    content = {k:json.loads(v) for k,v in d.iteritems() if v != "-1"}
+                    content = [json.loads(v) for k,v in d.iteritems() if v != "-1"]
                 elif type == "cache":
                     d = json.loads(self.rpc.getAllCache())
-                    content = {k:json.loads(v) for k,v in d.iteritems() if v != "-1"}
+                    content = [json.loads(v) for k,v in d.iteritems() if v != "-1"]
                 else:
                     return self.returnHelper(3, "invalid type")
                 return self.returnHelper(1, "", content)
