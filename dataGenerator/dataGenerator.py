@@ -2,7 +2,7 @@ import requests
 import random
 import userdata as DG
 
-postUrl = "http://192.168.99.100:2000"
+postUrl = "http://192.168.99.100:1000"
 
 def sendUser(profile):
     r = requests.post(postUrl+'/user/', data = profile)
@@ -26,7 +26,7 @@ def sendMsg(profile):
 
 fbids = {}
 
-userNum = 10
+userNum = 50
 for i in range(userNum):
     userData = DG.generateUser()
     sendUser(userData)
@@ -38,7 +38,7 @@ for i in range(userNum):
 # use a id from the fbids to create a post and store all the pids from return reponse
 
 pids = {}
-postNum = 10
+postNum = 50
 for i in range(postNum):
     uid = (fbids.keys())[int(random.random()*userNum)]
     post = DG.generatePost(uid)
@@ -54,7 +54,7 @@ for i in range(postNum):
 
 # use a uid generate some invite messages
 
-msgNum = 10
+msgNum = 50
 for i in range(msgNum):
     sid = (fbids.keys())[int(random.random()*userNum)]
     rid = (fbids.keys())[int(random.random()*userNum)]
