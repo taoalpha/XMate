@@ -57,7 +57,7 @@ def sendMsgPut(profile):
 
 fbids = {}
 
-userNum = 30
+userNum = 3
 for i in range(userNum):
     userData = DG.generateUser()
     sendUser(userData)
@@ -70,7 +70,7 @@ for i in range(userNum):
 # use a id from the fbids to create a post and store all the pids from return reponse
 
 pids = {}
-postNum = 30
+postNum = 3
 for i in range(postNum):
     uid = (fbids.keys())[int(random.random()*userNum)]
     post = DG.generatePost(uid)
@@ -85,7 +85,7 @@ for i in range(postNum):
 
 # use a uid generate some invite messages
 
-msgNum = 30
+msgNum = 3
 for i in range(msgNum):
     sid = (fbids.keys())[int(random.random()*userNum)]
     rid = (fbids.keys())[int(random.random()*userNum)]

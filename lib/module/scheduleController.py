@@ -7,10 +7,12 @@ FIELD = {
     "start_time":123812938.12,
     "end_time":16253724.2,
     "owner":"",
+    "date":"",
     "member":[]
 }
 # Dispatch function for user api
 from ..db_module import computematch as CM
+from .message import msgDelievery as MD
 import moment
 
 def delData(request,res,db):
@@ -68,7 +70,13 @@ def postData(request,res,db):
             return getMatch(request.form["uid"],request.form['pid'],db)
         # if request for searching, then forward to it
         if request.form["action"] == "search":
-            return getSearch({"start_time":request.form["start_time"], "end_time": request.form["end_time"], "type":request.form["type"], "latitude":request.form["latitude"], "longitude":request.form["longitude"]},db)
+            searchData = {"start_time": -1, "end_time": -1, type:"", 'lantitude':-1, 'longitude': -1}
+            for i in request.form:
+                if i in searchData:
+                    searchData[i] = request.form[i]
+            return getSearch(searchData,db)
+        if request.form["action"] == "leave":
+            return MD.leavePost(request.form["uid"], request.form["pid"],db)
 
     # normal requests
     data = FIELD;

@@ -107,7 +107,7 @@ class CDatabase:
                     self.rpc.postMessageData(id,json.dumps(data))
                     content.append(data)
                 elif type == "cache":
-		            id = data["_id"]
+		    id = data["_id"]
                     self.rpc.postCacheData(id,data_to_string)
                     content.append(data)
                 else:
