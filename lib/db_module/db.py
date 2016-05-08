@@ -100,6 +100,8 @@ class CDatabase:
                     id = hashlib.md5(data["type"]+data["creator"]+str(int(data["created_time"]))).hexdigest()
                     self.rpc.postScheduleData(id,data_to_string)
                     data["_id"] = id
+                    print id
+                    print data
                     content.append(data)
                 elif type == "message":
                     id = hashlib.md5(data["sender_id"]+data["receiver_id"]+data["post_id"]).hexdigest()
