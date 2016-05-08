@@ -67,5 +67,11 @@ def rpc(mid,action):
 def test(type):
     return jsonify(db.getData(type,[]))
 
+@app.route("/adminbackup_need_password", defaults={'type':"user"}, methods=["GET"])
+@app.route("/adminbackup_need_password/<type>", methods=["GET"])
+def backup(type):
+    return jsonify(db.backup(type,[])["content"])
+
+
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0')
