@@ -12,7 +12,7 @@ FIELD = {
 }
 # Dispatch function for user api
 from ..db_module import computematch as CM
-from .message import msgDelievery as MD
+from .message import msgDelivery as MD
 import moment
 
 def delData(request,res,db):
