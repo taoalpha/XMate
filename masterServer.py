@@ -2,6 +2,7 @@ from System import Action
 import clr
 clr.AddReference('Vsync') # The profile of the dll file.
 import Vsync
+
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
 import json
@@ -28,8 +29,6 @@ schedules = {}
 messages = {}
 cache = {}
 counter = 0
-masterId = -1
-myRank = -1
 
 '''
 global
@@ -201,7 +200,7 @@ def getMessageData(id):
 	if id in messages:
 		group.Reply(messages[id])
 	else:
-		group.Reply('-1')
+		group.Reply(-1)
 	print("Vsync server getMessageData with id=" + id.ToString())
 
 def removeMessageData_api(id):
@@ -271,7 +270,7 @@ def getScheduleData(id):
 	if id in schedules:
 		group.Reply(schedules[id])
 	else:
-		group.Reply('-1')
+		group.Reply(-1)
 	print("Vsync server getScheduleData with id=" + id.ToString())
 
 def removeScheduleData_api(id):
@@ -342,7 +341,7 @@ def getCacheData(id):
 	if id in cache:
 		group.Reply(cache[id])
 	else:
-		group.Reply('-1')
+		group.Reply(-1)
 	print("Vsync server get Cache with id=" + id.ToString())
 
 def removeCacheData_api(id):
@@ -387,14 +386,19 @@ def getAllSchedules_api():
 
 
 def giveMeAll(action):
+    # nothing master need to do
     print action
+
+def retrieveAll(action, data):
+    # nothing master need to do
+    dataset = json.loads(data)
+
+
 
 ### Vsycn register
 def myViewFunc(v):
-    global myRank,masterId
     print('New view: ' + v.ToString())
     print('My rank = ' + v.GetMyRank().ToString())
-    myRank = v.GetMyRank()
     for a in v.joiners:
         print('  Joining: ' + a.ToString() + ', isMyAddress='+a.isMyAddress().ToString())
     for a in v.leavers:

@@ -70,7 +70,7 @@ def postData(request,res,db):
             return getMatch(request.form["uid"],request.form['pid'],db)
         # if request for searching, then forward to it
         if request.form["action"] == "search":
-            searchData = {"start_time": -1, "end_time": -1, type:"", 'lantitude':-1, 'longitude': -1}
+            searchData = {"start_time": -1, "end_time": -1, "type":"", 'latitude':-1, 'longitude': -1}
             for i in request.form:
                 if i in searchData:
                     searchData[i] = request.form[i]
