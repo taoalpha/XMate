@@ -10,7 +10,7 @@ def getHash(post_content):
     st = moment.unix(post_content["start_time"])
     strhash += str(st.month) + str(st.day) 
 
-    if(post_content["latitude"] == ""):
+    if(post_content["latitude"] == -1):
         pass
     else:
         lat = '{:.1f}'.format(post_content["latitude"])
@@ -64,12 +64,11 @@ def computeMatchPosts(post_content, mydb):
 
     f1 = True
     f2 = True
-    if(post_content["start_time"] == ""):
+    if(post_content["start_time"] == -1):
         f1 = False
-    if(post_content["latitude"] == ""):
+    if(post_content["latitude"] == -1):
         f2 = False
 
-    print "######"
     #Find the match document list
     for doc in cursor:
 
@@ -79,7 +78,7 @@ def computeMatchPosts(post_content, mydb):
             continue
 
         if(post_content["type"] == "" or post_content["type"] == doc["type"]):
-            if(post_content["start_time"] == ""):
+            if(post_content["start_time"] == -1):
                 pass
             else:
                 st = moment.unix(post_content["start_time"])
@@ -94,7 +93,7 @@ def computeMatchPosts(post_content, mydb):
 
         if(flag):
 	    print doc
-            if(post_content["latitude"] == ""):
+            if(post_content["latitude"] == -1):
                 pass
             else:
                 pointa = (doc["latitude"],doc["longitude"])
