@@ -98,15 +98,13 @@ class CDatabase:
                     content.append(data)
                 elif type == "schedule":
                     id = hashlib.md5(data["type"]+data["creator"]+str(int(data["created_time"]))).hexdigest()
-                    self.rpc.postScheduleData(id,data_to_string)
                     data["_id"] = id
-                    print id
-                    print data
+                    self.rpc.postScheduleData(id,json.dumps(data))
                     content.append(data)
                 elif type == "message":
                     id = hashlib.md5(data["sender_id"]+data["receiver_id"]+data["post_id"]).hexdigest()
-                    self.rpc.postMessageData(id,data_to_string)
                     data["_id"] = id
+                    self.rpc.postMessageData(id,json.dumps(data))
                     content.append(data)
                 elif type == "cache":
 		    id = data["_id"]

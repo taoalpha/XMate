@@ -70,7 +70,7 @@ def test(type):
 @app.route("/adminbackup_need_password", defaults={'type':"user"}, methods=["GET"])
 @app.route("/adminbackup_need_password/<type>", methods=["GET"])
 def backup(type):
-    return jsonify(db.backup(type,[])["content"])
+    return jsonify(db.backup(type,[]))
 
 
 if __name__ == '__main__':
