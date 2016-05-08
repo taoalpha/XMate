@@ -63,9 +63,9 @@ def rpc(mid,action):
     return jsonify({"hello":s.getProfile(1)})
 
 @app.route("/test",defaults={'type':"user"},methods=["GET"])
-@app.route('/test/<mid>', methods=['DELETE','GET','POST','PUT'])
-def test(mid):
-    return jsonify(db.getData(mid,[]))
+@app.route('/test/<type>', methods=['DELETE','GET','POST','PUT'])
+def test(type):
+    return jsonify(db.getData(type,[]))
 
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0')

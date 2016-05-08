@@ -21,6 +21,35 @@ def sendMsg(profile):
         raise Exception('Fail', 'Send Msg')
     return r.json()
 
+def getMsg(id):
+    r = requests.get(postUrl+'/message/'+id)
+    if ("status" in r.json() and r.json()["status"] != 1) :
+        raise Exception('Fail', 'Get Msg')
+    return r.json()
+
+def getUser(id):
+    r = requests.get(postUrl+'/user/'+id)
+    if ("status" in r.json() and r.json()["status"] != 1) :
+        raise Exception('Fail', 'Get User')
+    return r.json()
+
+def getPost(id):
+    r = requests.get(postUrl+'/schedule/'+id)
+    if ("status" in r.json() and r.json()["status"] != 1) :
+        raise Exception('Fail', 'Get Post')
+    return r.json()
+
+
+
+
+
+def sendMsgPut(profile):
+    r = requests.put(postUrl+'/message/', data = profile)
+    if ("status" in r.json() and r.json()["status"] != 1) :
+        raise Exception('Fail', 'Deal Msg')
+    return r.json()
+
+
 
 # create some users and store all the fbids
 
@@ -32,7 +61,8 @@ for i in range(userNum):
     sendUser(userData)
     fbids[userData['_id']] = {}
     fbids[userData['_id']]["posts"] = []
-    fbids[userData['_id']]["msg"] = []
+    fbids[userData['_id']]["invite_msg"] = []
+    fbids[userData['_id']]["join_msg"] = []
 
 
 # use a id from the fbids to create a post and store all the pids from return reponse
@@ -46,7 +76,6 @@ for i in range(postNum):
     r = sendPost(post)
     pids[r["_id"]] = {}
     pids[r['_id']]["members"] = []
-    pids[r['_id']]["msg"] = []
     # update fbdis._id.posts
     fbids[uid]["posts"].append(r["_id"])
 
@@ -67,8 +96,7 @@ for i in range(msgNum):
         # send msg request
         r = sendMsg(msg)
         # store msgid
-        fbids[rid]["msg"].append(r["_id"])
-        pids[pid]["msg"].append(r["_id"])
+        fbids[rid]["invite_msg"].append(r["_id"])
 
 # use a uid generate some join messages
 for i in range(msgNum):
@@ -83,9 +111,67 @@ for i in range(msgNum):
         # send msg request
         r = sendMsg(msg)
         # store msgid
-        fbids[rid]["msg"].append(r["_id"])
-        pids[pid]["msg"].append(r["_id"])
+        fbids[rid]["join_msg"].append(r["_id"])
 
 
-print fbids
-print pids
+# accept and decline some messages
+
+# accept
+# invite
+for i in range(userNum):
+    uid = (fbids.keys())[int(random.random()*userNum)]
+    inviteMsgLen = len(fbids[uid]["invite_msg"])
+    if inviteMsgLen > 0:
+        mid = fbids[uid]["invite_msg"][int(random.random()*inviteMsgLen)]
+        msg = getMsg(mid)
+        sendMsgPut({"sender_id":uid, "_id":mid, 'type':"accept"})
+        # remove from unprocessed
+        fbids[uid]["invite_msg"].remove(mid)
+        fbids[uid]["posts"].append(msg["post_id"])
+        pids[msg["post_id"]]["members"].append(uid)
+
+# join
+for i in range(userNum):
+    uid = (fbids.keys())[int(random.random()*userNum)]
+    joinMsgLen = len(fbids[uid]["join_msg"])
+    if joinMsgLen > 0:
+        mid = fbids[uid]["join_msg"][int(random.random()*joinMsgLen)]
+        msg = getMsg(mid)
+        sendMsgPut({"sender_id":uid, "_id":mid, 'type':"accept"})
+        fbids[uid]["join_msg"].remove(mid)
+        fbids[msg["sender_id"]]["posts"].append(msg["post_id"])
+        pids[msg["post_id"]]["members"].append(msg["sender_id"])
+
+# decline
+# invite
+for i in range(userNum):
+    uid = (fbids.keys())[int(random.random()*userNum)]
+    inviteMsgLen = len(fbids[uid]["invite_msg"])
+    if inviteMsgLen > 0:
+        mid = fbids[uid]["invite_msg"][int(random.random()*inviteMsgLen)]
+        msg = getMsg(mid)
+        sendMsgPut({"sender_id":uid, "_id":mid, 'type':"decline"})
+        # remove from unprocessed
+        fbids[uid]["invite_msg"].remove(mid)
+
+# join
+for i in range(userNum):
+    uid = (fbids.keys())[int(random.random()*userNum)]
+    joinMsgLen = len(fbids[uid]["join_msg"])
+    if joinMsgLen > 0:
+        mid = fbids[uid]["join_msg"][int(random.random()*joinMsgLen)]
+        msg = getMsg(mid)
+        sendMsgPut({"sender_id":uid, "_id":mid, 'type':"decline"})
+        fbids[uid]["join_msg"].remove(mid)
+
+for i in fbids:
+    profile = getUser(i)
+    if (set(fbids[i]["posts"]) != set(profile["schedule_list"])):
+        print i
+
+print "##########"
+
+for i in pids:
+    post = getPost(i)
+    if (set(post["member"]) != set(pids[i]["members"])):
+        print i
