@@ -107,8 +107,15 @@ def getUserData_api(id):
             @param {string} id - user id
             @return {string} - either return the profile content or -1 for not found / deleted
 	"""
-	if id in users and users[id] != "-1":
+	if id in users:
 		return users[id]
+	else:
+		res = []
+		nr = group.Query(Vsync.Group.ALL, 1, id, Vsync.EOLMarker(), res)
+		print "result from group getting user"
+		print res
+		for ele in res:
+			return res
 	return "-1"
 
 def getUserData(id):
@@ -167,8 +174,15 @@ def getMessageData_api(id):
             @param {string} id - message id
             @return {string} - either return the message content or -1 for not found / deleted
 	"""
-	if id in messages and messages[id] != "-1":
+	if id in messages:
 		return messages[id]
+	else:
+		res = []
+		nr = group.Query(Vsync.Group.ALL, 4, id, Vsync.EOLMarker(), res)
+		print "result from group getting message"
+		print res
+		for ele in res:
+			return res
 	return "-1"
 
 def getMessageData(id):
@@ -228,6 +242,13 @@ def getScheduleData_api(id):
 	"""
 	if id in schedules and schedules[id] != "-1":
 		return schedules[id]
+	else:
+		res = []
+		nr = group.Query(Vsync.Group.ALL, 7, id, Vsync.EOLMarker(), res)
+		print "result from group getting"
+		print res
+		for ele in res:
+			return res
 	return "-1"
 
 def getScheduleData(id):
@@ -285,8 +306,15 @@ def getCacheData_api(id):
             @param {string} id - cache id
             @return {string} either return the found cache content or -1 represent not found / deleted
 	"""
-	if id in cache and cache[id] != "-1":
+	if id in cache:
 		return cache[id]
+	else:
+		res = []
+		nr = group.Query(Vsync.Group.ALL, 10, id, Vsync.EOLMarker(), res)
+		print "result from group getting cache"
+		print res
+		for ele in res:
+			return res
 	return "-1"
 
 
@@ -391,22 +419,22 @@ server.register_function(myViewFunc,'myViewFunc')
 
 # user related functions
 group.RegisterHandler(0, Action[str, str](postUserData))
-# group.RegisterHandler(1, Action[str](getUserData))
+group.RegisterHandler(1, Action[str](getUserData))
 # group.RegisterHandler(2, Action[str](removeUserData))
 
 # message related functions
 group.RegisterHandler(3, Action[str, str](postMessageData))
-# group.RegisterHandler(4, Action[str](getMessageData))
+group.RegisterHandler(4, Action[str](getMessageData))
 # group.RegisterHandler(5, Action[str](removeMessageData))
 
 # schedule related functions
 group.RegisterHandler(6, Action[str, str](postScheduleData))
-# group.RegisterHandler(7, Action[str](getScheduleData))
+group.RegisterHandler(7, Action[str](getScheduleData))
 # group.RegisterHandler(8, Action[str](removeScheduleData))
 
 # cache related functions
 group.RegisterHandler(9, Action[str, str](postCacheData))
-# group.RegisterHandler(10, Action[str](getCacheData))
+group.RegisterHandler(10, Action[str](getCacheData))
 # group.RegisterHandler(11, Action[str](removeCacheData))
 
 # view
