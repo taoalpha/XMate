@@ -12,6 +12,7 @@ def sendUser(profile):
 
 def sendPost(profile):
     r = requests.post(postUrl+'/schedule/', data = profile)
+    print r.json()
     if ("status" in r.json() and r.json()["status"] != 1) :
         raise Exception('Fail', 'Send Post')
     return r.json()
@@ -119,7 +120,6 @@ for i in range(msgNum):
 
 # accept
 # invite
-userNum = 10
 for i in range(userNum):
     uid = (fbids.keys())[int(random.random()*userNum)]
     inviteMsgLen = len(fbids[uid]["invite_msg"])
