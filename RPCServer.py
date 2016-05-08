@@ -29,6 +29,8 @@ messages = {}
 cache = {}
 loaded = False
 counter = 0
+masterId = -1
+myRank = -1
 
 '''
 global
