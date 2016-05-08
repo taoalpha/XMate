@@ -28,6 +28,7 @@ schedules = {}
 messages = {}
 cache = {}
 loaded = False
+counter = 0
 
 '''
 global
@@ -36,10 +37,19 @@ def backup():
     '''
         backup data.
     '''
-    return
+    global counter
 
-    with open('data.json', 'w') as outfile:
-        json.dump({"user":users,"schedule":schedules,"message":messages,"cache":cache}, outfile)
+    counter = counter + 1
+    if counter % 15 == 1:
+	counter = 1
+    	print "###backing#####"
+    	print "user length"+str(len(users.keys()))
+    	print "schedule length"+str(len(schedules.keys()))
+    	print "message length"+str(len(messages.keys()))
+    	print "cache length"+str(len(cache.keys()))
+
+    	with open('data.json', 'w') as outfile:
+    	    outfile.write(json.dumps({"user":users,"schedule":schedules,"message":messages,"cache":cache}))
 
 def loadBK():
     '''
@@ -49,9 +59,11 @@ def loadBK():
 	return
     global users, schedules, cache, messages
 
+    data = ''
     with open('data.json') as data_file:
-        dataset = json.load(data_file)
+	data = data_file.read()
 
+    dataset = json.loads(data)
     users = dataset["user"]
     schedules = dataset["schedule"]
     messages = dataset["message"]

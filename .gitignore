@@ -2,3 +2,5 @@
 *.log
 .DS_Store
 Vsync.dll
+data.json
+db.json
