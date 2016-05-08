@@ -113,7 +113,7 @@ def updateConflict(post_list,mydb):
     return returnHelper(content = nconflict_list)
 
 
-def updateUser(user_list, pid, mydb):
+def updateUser(user_list, pid, t, mydb):
     id_list = user_list
     res = mydb.getData("user",id_list)
     if(res["status"] != 1):
@@ -125,6 +125,9 @@ def updateUser(user_list, pid, mydb):
         user["history_events"].append(pid)
         user["schedule_list"].remove(pid)
         user["conflict_list"] = updateConflict(post_list,mydb)
+        user["total_activities"] = len(user["history_events"])
+        user["total_time"] += t
+        user["total_hours"] = (int)(user["total_time"] / 3600)
 
         id_list = user["unprocessed_message"]        
         res = mydb.getData("message",id_list)
@@ -161,11 +164,13 @@ def checkSchedule(mydb):
 
     current_time = moment.now().epoch()
     for doc in cursor:
-        if("finish" not in doc.keys() and doc["end_time"] > current_time):
+        if("finish" not in doc.keys() and doc["end_time"] < current_time):
             user_list = []
             user_list = doc["member"]
             user_list.append(doc["owner"])
-            res = updateUser(user_list,doc["_id"],mydb)
+            t = doc["end_time"] - doc["start_time"]
+
+            res = updateUser(user_list,doc["_id"],t,mydb)
             if(res["status"] != 1):
                 return res
 
