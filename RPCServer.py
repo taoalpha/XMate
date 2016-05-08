@@ -46,6 +46,20 @@ def backup():
 
     del dataset
 
+def loadBK():
+    '''
+        backup data.
+    '''
+    with open('data.json') as data_file:
+        dataset = json.load(data_file)
+    users = dataset["user"]
+    schedules = dataset["schedule"]
+    messages = dataset["message"]
+    cache = dataset["cache"]
+
+    del dataset
+
+
 """
     User DHT
 """
@@ -326,6 +340,9 @@ def myViewFunc(v):
         print('  Joining: ' + a.ToString() + ', isMyAddress='+a.isMyAddress().ToString())
     for a in v.leavers:
         print('  Leaving: ' + a.ToString() + ', isMyAddress='+a.isMyAddress().ToString())
+    if (v.GetMyRank().ToString() == "0") :
+        print "#load from recovery data"
+        loadBK()
     return
 
 
