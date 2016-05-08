@@ -114,7 +114,7 @@ def computeMatchPosts(post_content, mydb):
         if(f2):
             docu_list.sort(key = lambda postd: postd["diff"]) 
         else:
-            docu_list.sort(key = lambda postd: postd["post_datetime"],reverse = True) 
+            docu_list.sort(key = lambda postd: postd["post_datetime"],reverse = True)
     else:
         docu_list.sort(key = lambda postd: postd["time_diff"])
 
@@ -198,9 +198,9 @@ def computeMatchUsers(uid, pid, mydb):
                     recommend_user_list2.add(user_id)
 
     r1 = list(recommend_user_list1)
-    r1.sort(key = lambda postd: (postd["total_time"],reverse = True))
+    r1.sort(key = lambda postd: postd["total_time"],reverse = True)
     r2 = list(recommend_user_list2)
-    r2.sort(key = lambda postd: (postd["total_time"],reverse = True))
+    r2.sort(key = lambda postd: postd["total_time"],reverse = True)
     recommend_user_list = r1 + r2
     
     #if recommendation set size is too small, give some random results
@@ -217,7 +217,7 @@ def computeMatchUsers(uid, pid, mydb):
             if(doc["_id"] not in recommend_user_list):
             	ranlist.append(doc["_id"])
 
-            ranlist.sort(key = lambda postd: (postd["total_time"],reverse = True))
+            ranlist.sort(key = lambda postd: postd["total_time"],reverse = True)
         recommend_user_list += ranlist
 
     #get the user name from the recommended list
