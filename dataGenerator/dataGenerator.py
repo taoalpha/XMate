@@ -56,7 +56,7 @@ def sendMsgPut(profile):
 
 fbids = {}
 
-userNum = 10
+userNum = 30
 for i in range(userNum):
     userData = DG.generateUser()
     sendUser(userData)
@@ -69,13 +69,12 @@ for i in range(userNum):
 # use a id from the fbids to create a post and store all the pids from return reponse
 
 pids = {}
-postNum = 10
+postNum = 30
 for i in range(postNum):
     uid = (fbids.keys())[int(random.random()*userNum)]
     post = DG.generatePost(uid)
     # send schedule profile request and get the id
     r = sendPost(post)
-    time.sleep(1)
     pids[r["_id"]] = {}
     pids[r['_id']]["members"] = []
     # update fbdis._id.posts
@@ -85,7 +84,7 @@ for i in range(postNum):
 
 # use a uid generate some invite messages
 
-msgNum = 10
+msgNum = 30
 for i in range(msgNum):
     sid = (fbids.keys())[int(random.random()*userNum)]
     rid = (fbids.keys())[int(random.random()*userNum)]
@@ -170,6 +169,8 @@ for i in fbids:
     profile = getUser(i)
     if (set(fbids[i]["posts"]) != set(profile["schedule_list"])):
         print i
+        print fbids[i]["posts"]
+        print profile["schedule_list"]
 
 print "##########"
 
