@@ -84,6 +84,7 @@ def postData(request,res,db):
     
 
     res = db.insertData("schedule",[data])
+
     if (res["status"] != 1):
         return res
 
@@ -91,6 +92,7 @@ def postData(request,res,db):
 
     # update schedule_list for its owner
     userRes = db.getData("user",[request.form["creator"]])
+
     if (userRes["status"] != 1):
         return userRes
     user = userRes["content"][0]
@@ -205,7 +207,6 @@ def scheduleDispatch(sid,field,request,db):
     res = DISPATCH[request.method](request,res,db)
 
     if "action" in request.form:
-	print res["content"]
 	if (res["status"] != 1):
        	    return res
 	return res["content"]

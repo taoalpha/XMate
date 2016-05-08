@@ -27,7 +27,7 @@ users = {}
 schedules = {}
 messages = {}
 cache = {}
-
+loaded = False
 
 '''
 global
@@ -36,16 +36,9 @@ def backup():
     '''
         backup data.
     '''
-    dataset = {}
-    dataset["user"] = users
-    dataset["schedule"] = schedules
-    dataset["message"] = messages
-    dataset["cache"] = cache
 
     with open('data.json', 'w') as outfile:
-        json.dump(dataset, outfile)
-
-    del dataset
+        json.dump({"user":users,"schedule":schedules,"message":messages,"cache":cache}, outfile)
 
 def loadBK():
     '''
@@ -87,7 +80,7 @@ def postUserData(id, profile):
             @param {string} profile - stringified user profile
         '''
 	users[id] = profile
-        backup()
+        #backup()
 
         # for debugging
         if profile == "-1":
@@ -101,7 +94,9 @@ def getUserData_api(id):
             @param {string} id - user id
             @return {string} - either return the profile content or -1 for not found / deleted
 	"""
+	print id
 	if id in users and users[id] != "-1":
+		print users[id]
 		return users[id]
 	return "-1"
 
@@ -337,15 +332,17 @@ def getAllSchedules_api():
 
 ### Vsycn register
 def myViewFunc(v):
+    global loaded
     print('New view: ' + v.ToString())
     print('My rank = ' + v.GetMyRank().ToString())
     for a in v.joiners:
         print('  Joining: ' + a.ToString() + ', isMyAddress='+a.isMyAddress().ToString())
     for a in v.leavers:
         print('  Leaving: ' + a.ToString() + ', isMyAddress='+a.isMyAddress().ToString())
-    if (v.GetMyRank().ToString() == "0") :
+    if (v.GetMyRank().ToString() == "0" and loaded == False) :
         print "#load from recovery data"
         loadBK()
+	loaded = True
     return
 
 
