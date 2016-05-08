@@ -132,6 +132,37 @@ class CDatabase:
         except:
             return self.returnHelper(2,"Failed to connect to the rpc server")
 
+    def backup(self, type, id_list):
+        '''
+            Desc:
+                get documents by match_list
+            Args:
+                type: user/schedule/message
+                id_list: list of ids
+            Ret:
+                return the matched documents list
+        '''
+        if len(id_list) == 0:
+            # get all
+            try:
+                if type == "user":
+                    d = json.loads(self.rpc.getAllUsers())
+                    content = {k:json.loads(v) for k,v in d.iteritems() if v != "-1"}
+                elif type == "message":
+                    d = json.loads(self.rpc.getAllMessages())
+                    content = {k:json.loads(v) for k,v in d.iteritems() if v != "-1"}
+                elif type == "schedule":
+                    d = json.loads(self.rpc.getAllSchedules())
+                    content = {k:json.loads(v) for k,v in d.iteritems() if v != "-1"}
+                elif type == "cache":
+                    d = json.loads(self.rpc.getAllCache())
+                    content = {k:json.loads(v) for k,v in d.iteritems() if v != "-1"}
+                else:
+                    return self.returnHelper(3, "invalid type")
+                return self.returnHelper(1, "", content)
+            except:
+                return self.returnHelper(2,"Failed to get from rpc")
+
     def getData(self, type, id_list):
         '''
             Desc:

@@ -65,13 +65,6 @@ def getUserData_api(id):
 	if id in users and users[id] != "-1":
 		return users[id]
 	return "-1"
-	# res = []
-        # # delegate to vsync
-	# nr = group.Query(Vsync.Group.ALL, 1, id, Vsync.EOLMarker(), res)
-	# for ele in res:
-	# 	if (ele != -1):
-	# 		return ele
-	# return "-1"
 
 def getUserData(id):
         '''
@@ -131,13 +124,6 @@ def getMessageData_api(id):
 		return messages[id]
 	return "-1"
 
-	# res = []
-	# nr = group.Query(Vsync.Group.ALL, 4, id, Vsync.EOLMarker(), res)
-	# for ele in res:
-	# 	if (ele != -1):
-	# 		return ele
-	# return "-1"
-
 def getMessageData(id):
         '''
             get a message from the message DHT with the given id.
@@ -194,13 +180,6 @@ def getScheduleData_api(id):
 	if id in schedules and schedules[id] != "-1":
 		return schedules[id]
 	return "-1"
-
-	# res = []
-	# nr = group.Query(Vsync.Group.ALL, 7, id, Vsync.EOLMarker(), res)
-	# for ele in res:
-	# 	if (ele != -1):
-	# 		return ele
-	# return "-1"
 
 def getScheduleData(id):
         '''
@@ -360,22 +339,22 @@ server.register_function(myViewFunc,'myViewFunc')
 
 # user related functions
 group.RegisterHandler(0, Action[str, str](postUserData))
-group.RegisterHandler(1, Action[str](getUserData))
+# group.RegisterHandler(1, Action[str](getUserData))
 # group.RegisterHandler(2, Action[str](removeUserData))
 
 # message related functions
 group.RegisterHandler(3, Action[str, str](postMessageData))
-group.RegisterHandler(4, Action[str](getMessageData))
+# group.RegisterHandler(4, Action[str](getMessageData))
 # group.RegisterHandler(5, Action[str](removeMessageData))
 
 # schedule related functions
 group.RegisterHandler(6, Action[str, str](postScheduleData))
-group.RegisterHandler(7, Action[str](getScheduleData))
+# group.RegisterHandler(7, Action[str](getScheduleData))
 # group.RegisterHandler(8, Action[str](removeScheduleData))
 
 # cache related functions
 group.RegisterHandler(9, Action[str, str](postCacheData))
-group.RegisterHandler(10, Action[str](getCacheData))
+# group.RegisterHandler(10, Action[str](getCacheData))
 # group.RegisterHandler(11, Action[str](removeCacheData))
 
 # view

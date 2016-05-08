@@ -62,9 +62,16 @@ def rpc(mid,action):
     s.addUser(1,"fuck vysnc")
     return jsonify({"hello":s.getProfile(1)})
 
-@app.route("/test",methods=["GET"])
-def test():
-    return jsonify(db.getData("cache",[]))
+@app.route("/test",defaults={'type':"user"},methods=["GET"])
+@app.route('/test/<type>', methods=['DELETE','GET','POST','PUT'])
+def test(type):
+    return jsonify(db.getData(type,[]))
+
+@app.route("/adminbackup_need_password", defaults={'type':"user"}, methods=["GET"])
+@app.route("/adminbackup_need_password/<type>", methods=["GET"])
+def backup(type):
+    return jsonify(db.backup(type,[])["content"])
+
 
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0')
