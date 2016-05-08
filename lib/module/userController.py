@@ -106,6 +106,9 @@ FIELDS = {
     "conflict_list" : [],
     "history_events" : [],
     "unprocessed_message" : []
+    "total_hours":0,
+    "total_time":0,
+    "total_activities":0
 }
 
 # define dispatch handler for user
