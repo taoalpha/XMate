@@ -1,11 +1,10 @@
 import requests
-import random
-import userdata as DG
+import json
 
 postUrl = "http://192.168.99.100:2000"
 
 def getMsg():
-    r = requests.get(postUrl+'/adminbackup_need_password/msg')
+    r = requests.get(postUrl+'/adminbackup_need_password/message')
     if ("status" in r.json() and r.json()["status"] != 1) :
         raise Exception('Fail', 'Get Msg')
     return r.json()
@@ -17,7 +16,7 @@ def getUser():
     return r.json()
 
 def getPost():
-    r = requests.get(postUrl+'/adminbackup_need_password/post')
+    r = requests.get(postUrl+'/adminbackup_need_password/schedule')
     if ("status" in r.json() and r.json()["status"] != 1) :
         raise Exception('Fail', 'Get Post')
     return r.json()
@@ -30,9 +29,10 @@ def getCache():
 
 
 dataset = {}
-dataset["user"] = getuser()
-dataset["schedule"] = getPost()
-dataset["message"] = getMsg()
-dataset["cache"] = getCache()
+dataset["user"] = getUser()["content"]
+dataset["schedule"] = getPost()["content"]
+dataset["message"] = getMsg()["content"]
+dataset["cache"] = getCache()["content"]
 
-print dataset
+with open('data.json', 'w') as outfile:
+    json.dump(dataset, outfile)

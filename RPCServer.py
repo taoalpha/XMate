@@ -28,6 +28,24 @@ messages = {}
 cache = {}
 
 
+'''
+global
+'''
+def backup():
+    '''
+        backup data.
+    '''
+    dataset = {}
+    dataset["user"] = users
+    dataset["schedule"] = schedules
+    dataset["message"] = messages
+    dataset["cache"] = cache
+
+    with open('data.json', 'w') as outfile:
+        json.dump(dataset, outfile)
+
+    del dataset
+
 """
     User DHT
 """
@@ -49,6 +67,8 @@ def postUserData(id, profile):
             @param {string} profile - stringified user profile
         '''
 	users[id] = profile
+        backup()
+
         # for debugging
         if profile == "-1":
             print "Delete the user with id :"+id
@@ -107,6 +127,7 @@ def postMessageData(id, message):
         '''
 
 	messages[id] = message
+        backup()
         # for debugging
         if message == "-1":
             print "Delete the message with id :"+id
@@ -169,6 +190,7 @@ def postScheduleData(id, schedule):
             print "Add the schedule with id :"+id
 
 	schedules[id] = schedule
+        backup()
 
 def getScheduleData_api(id):
 	"""
@@ -221,6 +243,7 @@ def postCacheData(id, cache_content):
             @param {string} cache - cache content
         '''
 	cache[id] = cache_content
+        backup()
         # for debugging
         if cache_content == "-1":
             print "Delete the user with id :"+id

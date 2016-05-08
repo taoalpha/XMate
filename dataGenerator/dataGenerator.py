@@ -1,5 +1,6 @@
 import requests
 import random
+import time
 import userdata as DG
 
 postUrl = "http://192.168.99.100:1000"
@@ -55,7 +56,7 @@ def sendMsgPut(profile):
 
 fbids = {}
 
-userNum = 50
+userNum = 10
 for i in range(userNum):
     userData = DG.generateUser()
     sendUser(userData)
@@ -68,12 +69,13 @@ for i in range(userNum):
 # use a id from the fbids to create a post and store all the pids from return reponse
 
 pids = {}
-postNum = 50
+postNum = 10
 for i in range(postNum):
     uid = (fbids.keys())[int(random.random()*userNum)]
     post = DG.generatePost(uid)
     # send schedule profile request and get the id
     r = sendPost(post)
+    time.sleep(1)
     pids[r["_id"]] = {}
     pids[r['_id']]["members"] = []
     # update fbdis._id.posts
@@ -83,7 +85,7 @@ for i in range(postNum):
 
 # use a uid generate some invite messages
 
-msgNum = 50
+msgNum = 10
 for i in range(msgNum):
     sid = (fbids.keys())[int(random.random()*userNum)]
     rid = (fbids.keys())[int(random.random()*userNum)]

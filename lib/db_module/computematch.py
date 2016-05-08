@@ -210,7 +210,8 @@ def computeMatchUsers(uid, pid, mydb):
         ranlist = []
 
         for doc in tmplist:
-            ranlist.append(doc["_id"])
+            if(doc["_id"] not in recommend_user_list):
+            	ranlist.append(doc["_id"])
         recommend_user_list += ranlist
 
     #get the user name from the recommended list
