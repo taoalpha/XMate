@@ -49,7 +49,6 @@ def postUserData(id, profile):
             @param {string} profile - stringified user profile
         '''
 	users[id] = profile
-
         # for debugging
         if profile == "-1":
             print "Delete the user with id :"+id
