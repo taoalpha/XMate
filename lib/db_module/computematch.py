@@ -52,7 +52,7 @@ def computeMatchPosts(post_content, mydb):
                 oodflag = 1
                 pass
             else:
-                return res
+                return returnHelper(content = res["content"][0]["match_list"])
         else:
             return res
    
@@ -158,7 +158,7 @@ def computeMatchUsers(uid, pid, mydb):
                 oodflag = 1
                 pass
             else:
-                return res
+                return returnHelper(content = res["content"][0]["match_list"])
         else:
             return res
 
@@ -167,6 +167,7 @@ def computeMatchUsers(uid, pid, mydb):
     #compute from schedule list
     id_list = [pid]
     res = mydb.getData("schedule",id_list)
+
     if(res["status"] != 1):
         return res
     mpost = res["content"][0]
@@ -256,7 +257,7 @@ def returnHelper(status = 1, msg = None,content = None):
     return_val = {}
     return_val["status"] = status
     return_val["msg"] = msg
-    return_val["content"] = str(content)
+    return_val["content"] = content
 
     return return_val
 

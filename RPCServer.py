@@ -5,6 +5,7 @@ import Vsync
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
 import json
+import os.path
 
 #from threading import Thread
 
@@ -48,10 +49,15 @@ def backup():
 
 def loadBK():
     '''
-        backup data.
+        load backup.
     '''
+    if not os.path.isfile('data.json'):
+	return
+    global users, schedules, cache, messages
+
     with open('data.json') as data_file:
         dataset = json.load(data_file)
+
     users = dataset["user"]
     schedules = dataset["schedule"]
     messages = dataset["message"]
@@ -271,11 +277,8 @@ def getCacheData_api(id):
             @param {string} id - cache id
             @return {string} either return the found cache content or -1 represent not found / deleted
 	"""
-	res = []
-	nr = group.Query(Vsync.Group.ALL, 10, id, Vsync.EOLMarker(), res)
-	for ele in res:
-		if (ele != -1):
-			return ele
+	if id in cache and cache[id] != "-1":
+		return cache[id]
 	return "-1"
 
 

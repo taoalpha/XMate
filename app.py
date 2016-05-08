@@ -40,7 +40,7 @@ def schedule(sid,action):
     if status["status"] != 1:
         db.buildConnection()
     #db.selectCollection("xmateHistoryPost")
-    return jsonify(**scheduleDispatch(sid,action,request,db))
+    return json.dumps(scheduleDispatch(sid,action,request,db))
 
 @app.route('/message/', defaults={'mid':None, 'action': None},methods=['GET', 'POST','PUT','DELETE'])
 @app.route('/message/<mid>', defaults={'action': None},methods=['DELETE','GET','POST','PUT'])
@@ -50,7 +50,7 @@ def message(mid,action):
     if status["status"] != 1:
         db.buildConnection()
 
-    return jsonify(**messageDispatch(mid,action,request,db))
+    return json.dumps(messageDispatch(mid,action,request,db))
 
 # test for vsync connection
 @app.route('/rpc', defaults={'mid':None, 'action': None},methods=['GET', 'POST','PUT','DELETE'])

@@ -82,8 +82,6 @@ def postData(request,res,db):
     data["longitude"] = float(data["longitude"])
     data["latitude"] = float(data["latitude"])
     
-    print "no id here######"
-    print data
 
     res = db.insertData("schedule",[data])
     if (res["status"] != 1):
@@ -205,6 +203,12 @@ def scheduleDispatch(sid,field,request,db):
 
     # dispatch with method
     res = DISPATCH[request.method](request,res,db)
+
+    if "action" in request.form:
+	print res["content"]
+	if (res["status"] != 1):
+       	    return res
+	return res["content"]
 
     # return early if there is any err
     if (res["status"] != 1):

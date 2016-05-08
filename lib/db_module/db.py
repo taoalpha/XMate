@@ -187,6 +187,8 @@ class CDatabase:
                     content = [json.loads(v) for k,v in d.iteritems() if v != "-1"]
                 elif type == "cache":
                     d = json.loads(self.rpc.getAllCache())
+		    if d == {}:
+			return self.returnHelper(0,"no match")
                     content = [json.loads(v) for k,v in d.iteritems() if v != "-1"]
                 else:
                     return self.returnHelper(3, "invalid type")
@@ -198,19 +200,31 @@ class CDatabase:
         try:
             if type == "user":
                 for i in id_list:
-                    content.append(json.loads(self.rpc.getUserData(i)))
+                    temp = self.rpc.getUserData(i)
+		    if temp == "-1":
+			return self.returnHelper(0, "no match")
+                    content.append(json.loads(temp))
                 return self.returnHelper(1, "", content)
             elif type == "schedule":
                 for i in id_list:
-                    content.append(json.loads(self.rpc.getScheduleData(i)))
+                    temp = self.rpc.getScheduleData(i)
+		    if temp == "-1":
+			return self.returnHelper(0, "no match")
+                    content.append(json.loads(temp))
                 return self.returnHelper(1, "", content)
             elif type == "message":
                 for i in id_list:
-                    content.append(json.loads(self.rpc.getMessageData(i)))
+                    temp = self.rpc.getMessageData(i)
+		    if temp == "-1":
+			return self.returnHelper(0, "no match")
+                    content.append(json.loads(temp))
                 return self.returnHelper(1, "", content)
             elif type == "cache":
                 for i in id_list:
-                    content.append(json.loads(self.rpc.getCacheData(i)))
+		    temp = self.rpc.getCacheData(i)
+		    if temp == "-1":
+			return self.returnHelper(0, "no match")
+                    content.append(json.loads(temp))
                 return self.returnHelper(1, "", content)
             else:
                 return self.returnHelper(3, "invalid type")
