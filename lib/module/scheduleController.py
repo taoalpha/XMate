@@ -97,6 +97,8 @@ def postData(request,res,db):
         return userRes
     user = userRes["content"][0]
     # need to check conflict
+    print "####"
+    print pid
     user["schedule_list"].append(pid)
     userRes = db.updateData("user",[request.form["creator"]],[user])
     if (userRes["status"] != 1):

@@ -36,6 +36,7 @@ def backup():
     '''
         backup data.
     '''
+    return
 
     with open('data.json', 'w') as outfile:
         json.dump({"user":users,"schedule":schedules,"message":messages,"cache":cache}, outfile)

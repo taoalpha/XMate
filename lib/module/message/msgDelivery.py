@@ -267,9 +267,10 @@ def acceptRequest(uid, mid, mydb):
     if(res["status"] != 1):
         return res
     user = res["content"][0]
-    print user
     if(post_id not in user["schedule_list"]):
         res = updateConflict(user["schedule_list"], user["conflict_list"],post_id, mydb)
+	print "############## conflict #########"
+	print res
         if(res["status"] != 1):
             return res
         user["conflict_list"] = res["content"]
@@ -388,7 +389,6 @@ def finishReadMsg(uid, mid, mydb):
     id_list = []
     id_list.append(mid)
     res = mydb.removeData("message",id_list)
-    print res
     if(res["status"] != 1):
         return res
 
