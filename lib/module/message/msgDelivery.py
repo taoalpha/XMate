@@ -167,7 +167,7 @@ def sendJoin(uid, pid, mydb):
 def sendInvitation(uid, pid, rid, mydb):
     #create message
 
-    res = createMsg("invation", uid, rid, pid, "You are invited to the post", mydb)
+    res = createMsg("invitation", uid, rid, pid, "You are invited to the post", mydb)
     if(res["status"] != 1):
         return res
 
