@@ -403,7 +403,7 @@ def myViewFunc(v):
         # get data from other nodes
         print "#"
         group.Send(15, "givemeall")
-    elif:
+    else:
         print "#load from recovery data"
         loadBK()
     return
