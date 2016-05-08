@@ -81,7 +81,6 @@ def postData(request,res,db):
     data["start_time"] = float(data["start_time"])
     data["longitude"] = float(data["longitude"])
     data["latitude"] = float(data["latitude"])
-    
 
     res = db.insertData("schedule",[data])
 
