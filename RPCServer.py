@@ -116,7 +116,7 @@ def getUserData_api(id):
 		res = []
 		nr = group.Query(Vsync.Group.ALL, 1, id, Vsync.EOLMarker(), res)
 		for ele in res:
-			if ele ! = "-1":
+			if ele != "-1":
 				return ele
 	return "-1"
 
@@ -184,7 +184,7 @@ def getMessageData_api(id):
 		print "result from group getting message"
 		print res
 		for ele in res:
-			if ele ! = "-1":
+			if ele != "-1":
 				return ele
 	return "-1"
 
@@ -251,7 +251,7 @@ def getScheduleData_api(id):
 		print "result from group getting"
 		print res
 		for ele in res:
-			if ele ! = "-1":
+			if ele != "-1":
 				return ele
 	return "-1"
 
@@ -318,7 +318,7 @@ def getCacheData_api(id):
 		print "result from group getting cache"
 		print res
 		for ele in res:
-			if ele ! = "-1":
+			if ele != "-1":
 				return ele
 	return "-1"
 
