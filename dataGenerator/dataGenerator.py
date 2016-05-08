@@ -119,18 +119,21 @@ for i in range(msgNum):
 
 # accept
 # invite
+userNum = 10
 for i in range(userNum):
     uid = (fbids.keys())[int(random.random()*userNum)]
     inviteMsgLen = len(fbids[uid]["invite_msg"])
     if inviteMsgLen > 0:
         mid = fbids[uid]["invite_msg"][int(random.random()*inviteMsgLen)]
         msg = getMsg(mid)
+        print msg
         sendMsgPut({"sender_id":uid, "_id":mid, 'type':"accept"})
         # remove from unprocessed
         fbids[uid]["invite_msg"].remove(mid)
         fbids[uid]["posts"].append(msg["post_id"])
         pids[msg["post_id"]]["members"].append(uid)
 
+'''
 # join
 for i in range(userNum):
     uid = (fbids.keys())[int(random.random()*userNum)]
@@ -164,6 +167,7 @@ for i in range(userNum):
         msg = getMsg(mid)
         sendMsgPut({"sender_id":uid, "_id":mid, 'type':"decline"})
         fbids[uid]["join_msg"].remove(mid)
+'''
 
 for i in fbids:
     profile = getUser(i)

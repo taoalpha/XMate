@@ -79,14 +79,14 @@ def postUserData(id, profile):
             @param {string} id - user id
             @param {string} profile - stringified user profile
         '''
-	users[id] = profile
-        #backup()
-
         # for debugging
         if profile == "-1":
             print "Delete the user with id :"+id
+            del users[id]
         else:
             print "Add the user with id :"+id
+	    users[id] = profile
+        backup()
 
 def getUserData_api(id):
 	"""
@@ -94,9 +94,7 @@ def getUserData_api(id):
             @param {string} id - user id
             @return {string} - either return the profile content or -1 for not found / deleted
 	"""
-	print id
 	if id in users and users[id] != "-1":
-		print users[id]
 		return users[id]
 	return "-1"
 
@@ -141,13 +139,14 @@ def postMessageData(id, message):
             @param {string} message - message content
         '''
 
-	messages[id] = message
-        backup()
         # for debugging
         if message == "-1":
             print "Delete the message with id :"+id
+            del messages[id]
         else:
             print "Add the message with id :"+id
+	    messages[id] = message
+        backup()
 
 def getMessageData_api(id):
 	"""
@@ -201,10 +200,11 @@ def postScheduleData(id, schedule):
         # for debugging
         if schedule == "-1":
             print "Delete the schedule with id :"+id
+            del schedules[id]
         else:
             print "Add the schedule with id :"+id
+	    schedules[id] = schedule
 
-	schedules[id] = schedule
         backup()
 
 def getScheduleData_api(id):
@@ -257,14 +257,14 @@ def postCacheData(id, cache_content):
             @param {string} id - cache id
             @param {string} cache - cache content
         '''
-	cache[id] = cache_content
-        backup()
         # for debugging
         if cache_content == "-1":
             print "Delete the user with id :"+id
+            del cache[id]
         else:
+            cache[id] = cache_content
             print "Add the user with id :"+id
-
+        backup()
 
 def getCacheData_api(id):
 	"""
