@@ -105,7 +105,7 @@ FIELDS = {
     "schedule_list" : [],
     "conflict_list" : [],
     "history_events" : [],
-    "unprocessed_message" : []
+    "unprocessed_message" : [],
     "total_hours":0,
     "total_time":0,
     "total_activities":0
