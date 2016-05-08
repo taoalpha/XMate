@@ -38,6 +38,7 @@ def backup():
         backup data.
     '''
     global counter
+    return
 
     counter = counter + 1
     if counter % 15 == 1:
@@ -112,10 +113,9 @@ def getUserData_api(id):
 	else:
 		res = []
 		nr = group.Query(Vsync.Group.ALL, 1, id, Vsync.EOLMarker(), res)
-		print "result from group getting user"
-		print res
 		for ele in res:
-			return res
+			if ele ! = "-1":
+				return ele
 	return "-1"
 
 def getUserData(id):
@@ -182,7 +182,8 @@ def getMessageData_api(id):
 		print "result from group getting message"
 		print res
 		for ele in res:
-			return res
+			if ele ! = "-1":
+				return ele
 	return "-1"
 
 def getMessageData(id):
@@ -248,7 +249,8 @@ def getScheduleData_api(id):
 		print "result from group getting"
 		print res
 		for ele in res:
-			return res
+			if ele ! = "-1":
+				return ele
 	return "-1"
 
 def getScheduleData(id):
@@ -314,7 +316,8 @@ def getCacheData_api(id):
 		print "result from group getting cache"
 		print res
 		for ele in res:
-			return res
+			if ele ! = "-1":
+				return ele
 	return "-1"
 
 
