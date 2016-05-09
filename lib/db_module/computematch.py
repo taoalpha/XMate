@@ -114,7 +114,7 @@ def computeMatchPosts(post_content, mydb):
         if(f2):
             docu_list.sort(key = lambda postd: postd["diff"]) 
         else:
-            docu_list.sort(key = lambda postd: postd["create_time"],reverse = True)
+            docu_list.sort(key = lambda postd: postd["created_time"],reverse = True)
     else:
         docu_list.sort(key = lambda postd: postd["time_diff"])
 
