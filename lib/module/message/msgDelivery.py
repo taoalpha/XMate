@@ -68,13 +68,14 @@ def leavecheck(uid,pid,mydb):
 
     #check whether there are unprocessed message associated with the post
     id_list = msg_list
-    res = mydb.getData("message",id_list)
-    if(res["status"] != 1):
-        return res
-    cursor = res["content"]
-    for doc in cursor:
-        if(doc["post_id"] == pid and doc["type"] == "join"):
-            return returnHelper(0, msg = "You should first processe the join request msgs associated with this post")
+    if(len(id_list) > 0):
+        res = mydb.getData("message",id_list)
+        if(res["status"] != 1):
+            return res
+        cursor = res["content"]
+        for doc in cursor:
+            if(doc["post_id"] == pid and doc["type"] == "join"):
+                return returnHelper(0, msg = "You should first processe the join request msgs associated with this post")
 
     return returnHelper()
 
@@ -394,59 +395,6 @@ def finishReadMsg(uid, mid, mydb):
 
     return returnHelper()
 
-
-
-def checkMsg(mydb):
-
-    #get all messages and check the out of time message
-    id_list = []
-    res = mydb.getData("message", id_list)
-    if(res["status"] != 1):
-        return res
-    cursor = res["content"]
-
-    outoftime_msg = []
-    related_user = {}
-    current_time = moment.now().epoch()
-    st = current_time - 86400
-    for msg in cursor:
-        if(msg["create_time"] < st):
-            outoftime_msg.append(doc["_id"])
-            if(msg["receiver_id"] in related_user.keys()):
-                pass
-            else:
-                related_user[msg["receiver_id"]] = []
-            related_user[msg["receiver_id"]].append(msg["_id"])
-    if(len(outoftime_msg) == 0):
-        return returnHelper()
-
-    #update users' unprocessed msg list by removing the out of date msgs
-    id_list = related_user.keys()
-    res = mydb.getData("user",id_list)
-    if(res["status"] != 1):
-        return res
-    cursor = res["content"]
-
-    id_list = []
-    data_list = []
-    for user in cursor:
-        for msg_id in related_user[user["_id"]]:
-            if(msg_id in user["unprocessed_message"]):
-                user["unprocessed_message"].remove(msg_id)
-        id_list.append(user["_id"])
-        data_list.append(user)
-    res = mydb.updateData("user",id_list, data_list)
-    if(res["status"] != 1):
-        return res
-
-
-    #delete the out of time messages in database
-    id_list = outoftime_msg
-    res = mydb.removeData("message", id_list)
-    if(res["status"] != 1):
-        return res
-
-    return returnHelper()
 
 
 

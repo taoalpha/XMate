@@ -64,22 +64,23 @@ def checkMsg(mydb):
 
     #update users' unprocessed msg list by removing the out of date msgs
     id_list = related_user.keys()
-    res = mydb.getData("user",id_list)
-    if(res["status"] != 1):
-        return res
-    cursor = res["content"]
+    if(len(id_list) > 0):
+        res = mydb.getData("user",id_list)
+        if(res["status"] != 1):
+            return res
+        cursor = res["content"]
 
-    id_list = []
-    data_list = []
-    for user in cursor:
-        for msg_id in related_user[user["_id"]]:
-            if(msg_id in user["unprocessed_message"]):
-                user["unprocessed_message"].remove(msg_id)
-        id_list.append(user["_id"])
-        data_list.append(user)
-    res = mydb.updateData("user",id_list, data_list)
-    if(res["status"] != 1):
-        return res
+        id_list = []
+        data_list = []
+        for user in cursor:
+            for msg_id in related_user[user["_id"]]:
+                if(msg_id in user["unprocessed_message"]):
+                    user["unprocessed_message"].remove(msg_id)
+            id_list.append(user["_id"])
+            data_list.append(user)
+        res = mydb.updateData("user",id_list, data_list)
+        if(res["status"] != 1):
+            return res
 
 
     #delete the out of time messages in database
