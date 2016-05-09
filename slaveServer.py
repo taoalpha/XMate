@@ -97,10 +97,12 @@ def postUserData(id, profile):
         # for debugging
         if profile == "-1":
             print "Delete the user with id :"+id
-            del users[id]
+            if id in users:
+                del users[id]
         else:
             print "Add the user with id :"+id
-	    users[id] = profile
+            if ord(id[0]) % 2 == 0:
+	        users[id] = profile
         backup()
 
 def getUserData_api(id):
@@ -166,10 +168,12 @@ def postMessageData(id, message):
         # for debugging
         if message == "-1":
             print "Delete the message with id :"+id
-            del messages[id]
+            if id in messages:
+                del messages[id]
         else:
             print "Add the message with id :"+id
-	    messages[id] = message
+            if ord(id[0]) % 2 == 0:
+	        messages[id] = message
         backup()
 
 def getMessageData_api(id):
@@ -235,10 +239,12 @@ def postScheduleData(id, schedule):
         # for debugging
         if schedule == "-1":
             print "Delete the schedule with id :"+id
-            del schedules[id]
+            if id in schedules:
+                del schedules[id]
         else:
             print "Add the schedule with id :"+id
-	    schedules[id] = schedule
+            if ord(id[0]) % 2 == 0:
+	        schedules[id] = schedule
 
         backup()
 
@@ -306,7 +312,8 @@ def postCacheData(id, cache_content):
         # for debugging
         if cache_content == "-1":
             print "Delete the user with id :"+id
-            del cache[id]
+            if id in cache:
+                del cache[id]
         else:
             cache[id] = cache_content
             print "Add the user with id :"+id
