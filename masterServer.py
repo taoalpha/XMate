@@ -393,17 +393,20 @@ def getAllData(collection):
 def giveMeAll(action):
     # nothing master need to do
     if action == "slavecall":
-        group.Send(16, "giveslavedata", json.dumps({"users":users,"schedules":schedules,"messages":messages}))
+        group.Send(16, "giveslavedata", json.dumps({"users":users,"schedules":schedules,"messages":messages,"cache":cache}))
 
 def retrieveAll(action, data):
     # nothing master need to do
     if action != "givemasterdata":
         return
+
+    # todo: load from two slaves!
     global users, messages, cache, schedules
     dataset = json.loads(data)
     users = dataset["users"]
     messages = dataset["messages"]
     schedules = dataset["schedules"]
+    cache = dataset["cache"]
     del dataset
 
 
