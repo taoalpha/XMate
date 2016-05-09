@@ -29,7 +29,7 @@ messages = {}
 cache = {}
 counter = 0
 
-mod = 1
+mod = 0
 
 '''
 global
@@ -132,7 +132,7 @@ def getUserData(id):
 	if id in users:
 		group.Reply(users[id])
 	else:
-		group.Reply(-1)
+		group.Reply("-1")
         print("Get user with id :" + id)
 
 def removeUserData_api(id):
