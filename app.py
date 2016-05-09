@@ -24,7 +24,6 @@ def hello_world():
 @app.route('/user/<uid>/<action>')
 def user(uid,action):
     status = db.getStatus()
-    print status
     if status["status"] != 1:
         db.buildConnection()
     #return jsonify(**userDispatch(uid,action,request,db))
@@ -74,4 +73,4 @@ def backup(type):
 
 
 if __name__ == '__main__':
-    app.run(debug=True,host='0.0.0.0')
+    app.run(debug=False,host='0.0.0.0',threaded=False)

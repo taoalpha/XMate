@@ -92,7 +92,6 @@ def computeMatchPosts(post_content, mydb):
             flag = False
 
         if(flag):
-	    print doc
             if(post_content["latitude"] == -1):
                 pass
             else:
@@ -239,9 +238,7 @@ def computeMatchUsers(uid, pid, mydb):
     data_list.append(data)
 
     if(oodflag == 0):
-	print "a"
         res = mydb.insertData("cache",data_list)
-	print res
         if(res["status"] != 1):
             return res
     else:

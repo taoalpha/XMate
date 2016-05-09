@@ -270,8 +270,6 @@ def acceptRequest(uid, mid, mydb):
     user = res["content"][0]
     if(post_id not in user["schedule_list"]):
         res = updateConflict(user["schedule_list"], user["conflict_list"],post_id, mydb)
-	print "############## conflict #########"
-	print res
         if(res["status"] != 1):
             return res
         user["conflict_list"] = res["content"]

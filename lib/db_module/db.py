@@ -230,7 +230,6 @@ class CDatabase:
             if type == "user":
                 for i in id_list:
                     temp = self.rpc.getUserData(i)
-		    print temp
 		    if str(temp) == "-1":
 			return self.returnHelper(0, "no match")
                     content.append(json.loads(temp))
