@@ -209,11 +209,10 @@ def computeMatchUsers(uid, pid, mydb):
         tmplist = random.sample(cursor,5)
         ranlist = []
 
+        tmplist.sort(key = lambda postd: postd["total_time"],reverse = True)
         for doc in tmplist:
             if(doc["_id"] not in recommend_user_list):
-            	ranlist.append(doc["_id"])
-
-            ranlist.sort(key = lambda postd: postd["total_time"],reverse = True)
+            	ranlist.append(doc["_id"])         
         recommend_user_list += ranlist
 
     #get the user name from the recommended list
