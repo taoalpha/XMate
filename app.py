@@ -65,7 +65,7 @@ def rpc(mid,action):
 @app.route("/test",defaults={'type':"user"},methods=["GET"])
 @app.route('/test/<type>', methods=['DELETE','GET','POST','PUT'])
 def test(type):
-    return jsonify(db.getData(type,[]))
+    return jsonify(db.getAllData(type))
 
 @app.route("/adminbackup_need_password", defaults={'type':"user"}, methods=["GET"])
 @app.route("/adminbackup_need_password/<type>", methods=["GET"])
