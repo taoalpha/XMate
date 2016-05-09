@@ -129,7 +129,7 @@ def getUserData(id):
 	if id in users:
 		group.Reply(users[id])
 	else:
-		group.Reply(-1)
+		group.Reply("-1")
         print("Get user with id :" + id)
 
 def removeUserData_api(id):
@@ -200,7 +200,7 @@ def getMessageData(id):
 	if id in messages:
 		group.Reply(messages[id])
 	else:
-		group.Reply(-1)
+		group.Reply("-1")
 	print("Vsync server getMessageData with id=" + id.ToString())
 
 def removeMessageData_api(id):
@@ -270,7 +270,7 @@ def getScheduleData(id):
 	if id in schedules:
 		group.Reply(schedules[id])
 	else:
-		group.Reply(-1)
+		group.Reply("-1")
 	print("Vsync server getScheduleData with id=" + id.ToString())
 
 def removeScheduleData_api(id):
@@ -341,7 +341,7 @@ def getCacheData(id):
 	if id in cache:
 		group.Reply(cache[id])
 	else:
-		group.Reply(-1)
+		group.Reply("-1")
 	print("Vsync server get Cache with id=" + id.ToString())
 
 def removeCacheData_api(id):
@@ -393,17 +393,20 @@ def getAllData(collection):
 def giveMeAll(action):
     # nothing master need to do
     if action == "slavecall":
-        group.Send(16, "giveslavedata", json.dumps({"users":users,"schedules":schedules,"messages":messages}))
+        group.Send(16, "giveslavedata", json.dumps({"users":users,"schedules":schedules,"messages":messages,"cache":cache}))
 
 def retrieveAll(action, data):
     # nothing master need to do
     if action != "givemasterdata":
         return
+
+    # todo: load from two slaves!
     global users, messages, cache, schedules
     dataset = json.loads(data)
     users = dataset["users"]
     messages = dataset["messages"]
     schedules = dataset["schedules"]
+    cache = dataset["cache"]
     del dataset
 
 
