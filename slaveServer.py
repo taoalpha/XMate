@@ -424,12 +424,27 @@ def getAllCache_api():
 def giveMeAll(action):
     if action == "givemedata":
         group.Send(16, "givemasterdata", json.dumps({"users":users,"schedules":schedules,"messages":messages}))
+    elif action == "slavecall":
+        return
 
 def retrieveAll(action, dataset):
     print "from slave server"
     print dataset
+    global users, schedules, messages, cache
     if action == "givemasterdata":
         return
+    elif action == "giveslavedata":
+        data = json.loads(dataset)
+        cache = data["cache"]
+        for i in data["users"]:
+            if ord(i[0]) % 2 == mod:
+                users[i] = data["users"][i]
+        for i in data["schedules"]:
+            if ord(i[0]) % 2 == mod:
+                schedules[i] = data["schedules"][i]
+        for i in data["messages"]:
+            if ord(i[0]) % 2 == mod:
+                messages[i] = data["messages"][i]
 
 ### Vsycn register
 def myViewFunc(v):
@@ -439,6 +454,8 @@ def myViewFunc(v):
         print('  Joining: ' + a.ToString() + ', isMyAddress='+a.isMyAddress().ToString())
     for a in v.leavers:
         print('  Leaving: ' + a.ToString() + ', isMyAddress='+a.isMyAddress().ToString())
+    if v.GetMyRank().ToString() != "0":
+        group.Send(15, "slavecall")
     return
 
 

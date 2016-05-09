@@ -392,7 +392,8 @@ def getAllData(collection):
 
 def giveMeAll(action):
     # nothing master need to do
-    print action
+    if action == "slavecall":
+        group.Send(16, "giveslavedata", json.dumps({"users":users,"schedules":schedules,"messages":messages}))
 
 def retrieveAll(action, data):
     # nothing master need to do
