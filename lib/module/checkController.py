@@ -24,8 +24,8 @@ def checkCache(mydb):
 
     outoftime_cache = []
     current_time = moment.now().epoch()
-    for doc  in cursor:
-        if(doc["create_time"] < current_time - 86400)
+    for doc in cursor:
+        if(doc["create_time"] < current_time - 86400):
             outoftime_cache.append(doc["_id"])
 
     id_list = outoftime_cache
@@ -124,17 +124,18 @@ def updateUser(user_list, pid, t, mydb):
     for user in cursor:
         user["history_events"].append(pid)
         user["schedule_list"].remove(pid)
-        user["conflict_list"] = updateConflict(post_list,mydb)
+        user["conflict_list"] = updateConflict(user["schedule_list"],mydb)
         user["total_activities"] = len(user["history_events"])
         user["total_time"] += t
         user["total_hours"] = (int)(user["total_time"] / 3600)
 
+
         id_list = user["unprocessed_message"]        
-        res = mydb.getData("message",id_list)
-        if(res["status"] != 1):
-            return res
-        cursor = list(res["content"])
-        for msg in cursor:
+        mres = mydb.getData("message",id_list)
+        if(mres["status"] != 1):
+            return mres
+        mcursor = list(mres["content"])
+        for msg in mcursor:
             if(msg["post_id"] == pid):
                 del_msg.add(msg["_id"])
                 user["unprocessed_message"].remove(msg["_id"])
