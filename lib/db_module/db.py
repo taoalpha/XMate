@@ -146,13 +146,13 @@ class CDatabase:
             # get all
             try:
                 if type == "user":
-                    d = json.loads(self.rpc.getAllUsers())
+                    d = json.loads(self.rpc.getAll("user"))
                     content = {k:json.loads(v) for k,v in d.iteritems() if v != "-1"}
                 elif type == "message":
-                    d = json.loads(self.rpc.getAllMessages())
+                    d = json.loads(self.rpc.getAll("message"))
                     content = {k:json.loads(v) for k,v in d.iteritems() if v != "-1"}
                 elif type == "schedule":
-                    d = json.loads(self.rpc.getAllSchedules())
+                    d = json.loads(self.rpc.getAll("schedule"))
                     content = {k:json.loads(v) for k,v in d.iteritems() if v != "-1"}
                 elif type == "cache":
                     d = json.loads(self.rpc.getAllCache())
@@ -177,13 +177,13 @@ class CDatabase:
             # get all
             try:
                 if type == "user":
-                    d = json.loads(self.rpc.getAllUsers())
+                    d = json.loads(self.rpc.getAll('user'))
                     content = [json.loads(v) for k,v in d.iteritems() if v != "-1"]
                 elif type == "message":
-                    d = json.loads(self.rpc.getAllMessages())
+                    d = json.loads(self.rpc.getAll('message'))
                     content = [json.loads(v) for k,v in d.iteritems() if v != "-1"]
                 elif type == "schedule":
-                    d = json.loads(self.rpc.getAllSchedules())
+                    d = json.loads(self.rpc.getAll('schedule'))
                     content = [json.loads(v) for k,v in d.iteritems() if v != "-1"]
                 elif type == "cache":
                     d = json.loads(self.rpc.getAllCache())
