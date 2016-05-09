@@ -364,6 +364,35 @@ def removeCacheData_api(id):
 
 
 # for retrieving all user / message / schedule
+def getAll_api(collection):
+	"""
+            Retrieve all based on specific collection, including all keys and values.
+            @return {string} - return stringify content of the collection
+	"""
+        res = []
+	nr = group.Query(Vsync.Group.ALL, 17, collection, Vsync.EOLMarker(), res)
+        dataset = {}
+        for ele in res:
+            if ele != "-1":
+                temp = json.loads(ele)
+                for i in temp:
+                    dataset[i] = temp[i]
+
+        return json.dumps(dataset)
+
+def getAllData(collection):
+    '''
+        Retrieve data based on collection.
+        @param {string} collection - specify the collection
+    '''
+    if collection == "user":
+        group.Reply(json.dumps(users))
+    elif collection == "schedule":
+        group.Reply(json.dumps(schedules))
+    elif collection == "message":
+        group.Reply(json.dumps(messages))
+
+# for retrieving all user / message / schedule
 def getAllUsers_api():
 	"""
             Retrieve all users, including all keys and values.
@@ -378,13 +407,6 @@ def getAllMessages_api():
 	"""
         return json.dumps(messages)
 
-def getAllCache_api():
-	"""
-            Retrieve all cache, including all keys and values.
-            @return {string} - return stringify content of users
-	"""
-        return json.dumps(cache)
-
 def getAllSchedules_api():
 	"""
             Retrieve all schedules including all keys and values.
@@ -392,6 +414,12 @@ def getAllSchedules_api():
 	"""
         return json.dumps(schedules)
 
+def getAllCache_api():
+	"""
+            Retrieve all cache, including all keys and values.
+            @return {string} - return stringify content of users
+	"""
+        return json.dumps(cache)
 
 def giveMeAll(action):
     if action == "givemedata":
@@ -434,10 +462,12 @@ server.register_function(postCacheData_api,'postCacheData')
 server.register_function(getCacheData_api,'getCacheData')
 server.register_function(removeCacheData_api,'removeCacheData')
 # retrieve all
+server.register_function(getAll_api,'getAll')
 server.register_function(getAllUsers_api,'getAllUsers')
 server.register_function(getAllSchedules_api,'getAllSchedules')
 server.register_function(getAllMessages_api,'getAllMessages')
 server.register_function(getAllCache_api,'getAllCache')
+
 # view
 server.register_function(myViewFunc,'myViewFunc')
 
@@ -468,6 +498,7 @@ group.RegisterHandler(10, Action[str](getCacheData))
 # get all data
 group.RegisterHandler(15, Action[str](giveMeAll))
 group.RegisterHandler(16, Action[str,str](retrieveAll))
+group.RegisterHandler(17, Action[str](getAllData))
 
 # view
 group.RegisterViewHandler(Vsync.ViewHandler(myViewFunc))

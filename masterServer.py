@@ -384,6 +384,11 @@ def getAllSchedules_api():
 	"""
         return json.dumps(schedules)
 
+def getAllData(collection):
+    '''
+        Don't respond the the getAll from slaves
+    '''
+    group.Reply("-1")
 
 def giveMeAll(action):
     # nothing master need to do
@@ -473,6 +478,7 @@ group.RegisterHandler(10, Action[str](getCacheData))
 # get all data
 group.RegisterHandler(15, Action[str](giveMeAll))
 group.RegisterHandler(16, Action[str,str](retrieveAll))
+group.RegisterHandler(17, Action[str](getAllData))
 
 # view
 group.RegisterViewHandler(Vsync.ViewHandler(myViewFunc))
