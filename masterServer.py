@@ -412,8 +412,8 @@ def myViewFunc(v):
     if (v.GetMyRank().ToString() == "2"):
         # get data from other nodes
         print "#"
-        group.Send(15, "givemeall")
-    elif:
+        group.Send(15, "givemedata")
+    else:
         print "#load from recovery data"
         loadBK()
     return
