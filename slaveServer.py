@@ -391,6 +391,8 @@ def giveMeAll(action):
         group.Send(16, "givemasterdata", json.dumps({"users":users,"schedules":schedules,"messages":messages}))
 
 def retrieveAll(action, dataset):
+    print "from slave server"
+    print dataset
     if action == "givemasterdata":
         return
 
@@ -404,13 +406,6 @@ def myViewFunc(v):
         print('  Joining: ' + a.ToString() + ', isMyAddress='+a.isMyAddress().ToString())
     for a in v.leavers:
         print('  Leaving: ' + a.ToString() + ', isMyAddress='+a.isMyAddress().ToString())
-    if (v.GetMyRank().ToString() == "2"):
-        # get data from other nodes
-        print "#"
-        group.Send(15, "givemeall")
-    else:
-        print "#load from recovery data"
-        loadBK()
     return
 
 
