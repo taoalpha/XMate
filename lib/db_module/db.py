@@ -201,28 +201,28 @@ class CDatabase:
             if type == "user":
                 for i in id_list:
                     temp = self.rpc.getUserData(i)
-		    if temp == "-1":
+		    if str(temp) == "-1":
 			return self.returnHelper(0, "no match")
                     content.append(json.loads(temp))
                 return self.returnHelper(1, "", content)
             elif type == "schedule":
                 for i in id_list:
                     temp = self.rpc.getScheduleData(i)
-		    if temp == "-1":
+		    if str(temp) == "-1":
 			return self.returnHelper(0, "no match")
                     content.append(json.loads(temp))
                 return self.returnHelper(1, "", content)
             elif type == "message":
                 for i in id_list:
                     temp = self.rpc.getMessageData(i)
-		    if temp == "-1":
+		    if str(temp) == "-1":
 			return self.returnHelper(0, "no match")
                     content.append(json.loads(temp))
                 return self.returnHelper(1, "", content)
             elif type == "cache":
                 for i in id_list:
 		    temp = self.rpc.getCacheData(i)
-		    if temp == "-1":
+		    if str(temp) == "-1":
 			return self.returnHelper(0, "no match")
                     content.append(json.loads(temp))
                 return self.returnHelper(1, "", content)

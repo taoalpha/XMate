@@ -28,8 +28,8 @@ schedules = {}
 messages = {}
 cache = {}
 counter = 0
-masterId = -1
-myRank = -1
+
+mod = 1
 
 '''
 global
@@ -101,7 +101,7 @@ def postUserData(id, profile):
                 del users[id]
         else:
             print "Add the user with id :"+id
-            if ord(id[0]) % 2 == 0:
+            if ord(id[0]) % 2 == mod:
 	        users[id] = profile
         backup()
 
@@ -172,7 +172,7 @@ def postMessageData(id, message):
                 del messages[id]
         else:
             print "Add the message with id :"+id
-            if ord(id[0]) % 2 == 0:
+            if ord(id[0]) % 2 == mod:
 	        messages[id] = message
         backup()
 
@@ -243,7 +243,7 @@ def postScheduleData(id, schedule):
                 del schedules[id]
         else:
             print "Add the schedule with id :"+id
-            if ord(id[0]) % 2 == 0:
+            if ord(id[0]) % 2 == mod:
 	        schedules[id] = schedule
 
         backup()
@@ -405,10 +405,8 @@ def retrieveAll(action, dataset):
 
 ### Vsycn register
 def myViewFunc(v):
-    global myRank,masterId
     print('New view: ' + v.ToString())
     print('My rank = ' + v.GetMyRank().ToString())
-    myRank = v.GetMyRank()
     for a in v.joiners:
         print('  Joining: ' + a.ToString() + ', isMyAddress='+a.isMyAddress().ToString())
     for a in v.leavers:
