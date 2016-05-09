@@ -175,17 +175,17 @@ class CDatabase:
         '''
         try:
             if type == "user":
-                d = json.loads(self.rpc.getAllUsers('user'))
-                content = [json.loads(v) for k,v in d.iteritems() if v != "-1"]
+                d = json.loads(self.rpc.getAllUsers())
+                content = {k:json.loads(v) for k,v in d.iteritems() if v != "-1"}
             elif type == "message":
-                d = json.loads(self.rpc.getAllMessages('message'))
-                content = [json.loads(v) for k,v in d.iteritems() if v != "-1"]
+                d = json.loads(self.rpc.getAllMessages())
+                content = {k:json.loads(v) for k,v in d.iteritems() if v != "-1"}
             elif type == "schedule":
-                d = json.loads(self.rpc.getAllSchedules('schedule'))
-                content = [json.loads(v) for k,v in d.iteritems() if v != "-1"]
+                d = json.loads(self.rpc.getAllSchedules())
+                content = {k:json.loads(v) for k,v in d.iteritems() if v != "-1"}
             elif type == "cache":
                 d = json.loads(self.rpc.getAllCache())
-                content = [json.loads(v) for k,v in d.iteritems() if v != "-1"]
+                content = {k:json.loads(v) for k,v in d.iteritems() if v != "-1"}
             else:
                 return self.returnHelper(3, "invalid type")
             return self.returnHelper(1, "", content)
@@ -230,6 +230,7 @@ class CDatabase:
             if type == "user":
                 for i in id_list:
                     temp = self.rpc.getUserData(i)
+		    print temp
 		    if str(temp) == "-1":
 			return self.returnHelper(0, "no match")
                     content.append(json.loads(temp))
