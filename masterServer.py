@@ -38,10 +38,9 @@ def backup():
         backup data.
     '''
     global counter
-    return
 
     counter = counter + 1
-    if counter % 15 == 1:
+    if counter % 5 == 1:
 	counter = 1
     	print "###backing#####"
     	print "user length"+str(len(users.keys()))
@@ -403,10 +402,15 @@ def retrieveAll(action, data):
     # todo: load from two slaves!
     global users, messages, cache, schedules
     dataset = json.loads(data)
-    users = dataset["users"]
-    messages = dataset["messages"]
-    schedules = dataset["schedules"]
-    cache = dataset["cache"]
+    for i in dataset["users"]:
+	users[i] = dataset["users"][i]
+    for i in dataset["schedules"]:
+	schedules[i] = dataset["schedules"][i]
+    for i in dataset["messages"]:
+	messages[i] = dataset["messages"][i]
+    for i in dataset["users"]:
+	cache[i] = dataset["cache"][i]
+
     del dataset
 
 
