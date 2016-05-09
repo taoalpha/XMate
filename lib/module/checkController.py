@@ -171,16 +171,16 @@ def checkSchedule(mydb):
             user_list.append(doc["owner"])
             t = doc["end_time"] - doc["start_time"]
 
-            res = updateUser(user_list,doc["_id"],t,mydb)
-            if(res["status"] != 1):
-                return res
+            ures = updateUser(user_list,doc["_id"],t,mydb)
+            if(ures["status"] != 1):
+                return ures
 
             doc["finish"] = True
             id_list = [doc["_id"]]
             data_list = [doc]
-            res = mydb.updateData("schedule",id_list,data_list)
-            if(res["status"] != 1):
-                return res
+            sres = mydb.updateData("schedule",id_list,data_list)
+            if(sres["status"] != 1):
+                return sres
 
     return returnHelper()
 
