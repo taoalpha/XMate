@@ -423,7 +423,7 @@ def getAllCache_api():
 
 def giveMeAll(action):
     if action == "givemedata":
-        group.Send(16, "givemasterdata", json.dumps({"users":users,"schedules":schedules,"messages":messages}))
+        group.Send(16, "givemasterdata", json.dumps({"users":users,"schedules":schedules,"messages":messages,"cache":cache}))
     elif action == "slavecall":
         return
 
