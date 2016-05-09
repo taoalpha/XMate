@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import moment
+import json
 
 # Dispatch function for user api
 
@@ -114,7 +115,7 @@ def updateConflict(post_list,mydb):
 
 
 def updateUser(user_list, pid, t, mydb):
-    id_list = user_list
+    id_list = json.loads(json.dumps(user_list))
     res = mydb.getData("user",id_list)
     if(res["status"] != 1):
         return res
@@ -130,17 +131,18 @@ def updateUser(user_list, pid, t, mydb):
         user["total_hours"] = (int)(user["total_time"] / 3600)
 
 
-        id_list = user["unprocessed_message"]        
-        mres = mydb.getData("message",id_list)
-        if(mres["status"] != 1):
-            return mres
-        mcursor = list(mres["content"])
-        for msg in mcursor:
-            if(msg["post_id"] == pid):
-                del_msg.add(msg["_id"])
-                user["unprocessed_message"].remove(msg["_id"])
+        id_list = user["unprocessed_message"] 
+        if(len(id_list) != 0):
+            mres = mydb.getData("message",id_list)
+            if(mres["status"] != 1):
+                return mres
+            mcursor = list(mres["content"])
+            for msg in mcursor:
+                if(msg["post_id"] == pid):
+                    del_msg.add(msg["_id"])
+                    user["unprocessed_message"].remove(msg["_id"])
 
-    id_list = user_list
+    id_list = json.loads(json.dumps(user_list))
     data_list = cursor
     res = mydb.updateData("user",id_list,data_list)
     if(res["status"] != 1):
@@ -162,10 +164,11 @@ def checkSchedule(mydb):
     if(res["status"] != 1):
         return res
     cursor = res["content"]
-
     current_time = moment.now().epoch()
+    
     for doc in cursor:
         if("finish" not in doc.keys() and doc["end_time"] < current_time):
+            doc["finish"] = True
             user_list = []
             user_list = doc["member"]
             user_list.append(doc["owner"])
@@ -175,7 +178,7 @@ def checkSchedule(mydb):
             if(ures["status"] != 1):
                 return ures
 
-            doc["finish"] = True
+
             id_list = [doc["_id"]]
             data_list = [doc]
             sres = mydb.updateData("schedule",id_list,data_list)
