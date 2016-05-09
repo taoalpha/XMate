@@ -391,8 +391,14 @@ def giveMeAll(action):
 
 def retrieveAll(action, data):
     # nothing master need to do
+    if action != "givemasterdata":
+        return
+    global users, messages, cache, schedules
     dataset = json.loads(data)
-
+    users = dataset["users"]
+    messages = dataset["messages"]
+    schedules = dataset["schedules"]
+    del dataset
 
 
 ### Vsycn register
@@ -466,6 +472,7 @@ group.RegisterHandler(10, Action[str](getCacheData))
 
 # get all data
 group.RegisterHandler(15, Action[str](giveMeAll))
+group.RegisterHandler(16, Action[str,str](retrieveAll))
 
 # view
 group.RegisterViewHandler(Vsync.ViewHandler(myViewFunc))

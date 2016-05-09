@@ -387,7 +387,12 @@ def getAllSchedules_api():
 
 
 def giveMeAll(action):
-    print action
+    if action == "givemedata":
+        group.Send(16, "givemasterdata", json.dumps({"users":users,"schedules":schedules,"messages":messages}))
+
+def retrieveAll(action, dataset):
+    if action == "givemasterdata":
+        return
 
 ### Vsycn register
 def myViewFunc(v):
@@ -462,6 +467,7 @@ group.RegisterHandler(10, Action[str](getCacheData))
 
 # get all data
 group.RegisterHandler(15, Action[str](giveMeAll))
+group.RegisterHandler(16, Action[str,str](retrieveAll))
 
 # view
 group.RegisterViewHandler(Vsync.ViewHandler(myViewFunc))
