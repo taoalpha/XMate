@@ -1,9 +1,17 @@
 #!/bin/sh
 # restart script
 
+export IRONPYTHONPATH=/root/ironPython/External.LCA_RESTRICTED/Languages/IronPython/27/Lib
+
 DATA_SERVER="masterServer.py"
 FLASK_SERVER="slaveServer.py"
 
+if [ $1 == 1 ]
+then
+  DATA_SERVER=$FLASK_SERVER
+fi
+
+echo $DATA_SERVER
 # if vsync server down, then restart entire node
 ps auxw | grep $DATA_SERVER | grep -v grep > /dev/null
 
@@ -13,8 +21,6 @@ STATUS_ONE=$?
 ps auxw | grep app.py | grep -v grep > /dev/null
 
 STATUS_TWO=$?
-
-
 
 # if flask down and vsync still running
 #   restart the flask
