@@ -6,6 +6,8 @@ import userdata as DG
 postUrl = "http://192.168.99.100:1000"
 
 def sendUser(profile):
+    print "#user data#"
+    print profile
     r = requests.post(postUrl+'/user/', data = profile)
     if ("status" in r.json() and r.json()["status"] != 1) :
         raise Exception('Fail', 'Send User')
@@ -57,7 +59,7 @@ def sendMsgPut(profile):
 
 fbids = {}
 
-userNum = 3
+userNum = 10
 for i in range(userNum):
     userData = DG.generateUser()
     sendUser(userData)
@@ -70,7 +72,7 @@ for i in range(userNum):
 # use a id from the fbids to create a post and store all the pids from return reponse
 
 pids = {}
-postNum = 3
+postNum = 10
 for i in range(postNum):
     uid = (fbids.keys())[int(random.random()*userNum)]
     post = DG.generatePost(uid)
@@ -85,7 +87,7 @@ for i in range(postNum):
 
 # use a uid generate some invite messages
 
-msgNum = 3
+msgNum = 10
 for i in range(msgNum):
     sid = (fbids.keys())[int(random.random()*userNum)]
     rid = (fbids.keys())[int(random.random()*userNum)]
@@ -133,7 +135,6 @@ for i in range(userNum):
         fbids[uid]["posts"].append(msg["post_id"])
         pids[msg["post_id"]]["members"].append(uid)
 
-'''
 # join
 for i in range(userNum):
     uid = (fbids.keys())[int(random.random()*userNum)]
@@ -167,7 +168,6 @@ for i in range(userNum):
         msg = getMsg(mid)
         sendMsgPut({"sender_id":uid, "_id":mid, 'type':"decline"})
         fbids[uid]["join_msg"].remove(mid)
-'''
 
 for i in fbids:
     profile = getUser(i)

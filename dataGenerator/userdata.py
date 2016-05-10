@@ -90,7 +90,7 @@ def generatePost(uid):
     post["latitude"] = float(''.join(random.choice(string.digits) for _ in range(5))) / 1000
     post["longitude"] = float(''.join(random.choice(string.digits) for _ in range(5))) / 1000
     # < 10 days from now
-    post["start_time"] = moment.now().epoch() + int(random.random()*86400*10)
+    post["start_time"] = moment.now().epoch() - int(random.random()*86400*10)
     # < 3 hours from start_time
     post["end_time"] = post["start_time"] + int(random.random()*3*60*60)
     # < 2 days to now
