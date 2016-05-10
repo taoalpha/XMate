@@ -59,8 +59,6 @@ def postData(request,res,db):
 
     # convert uid to int, can be deleted later(we don't need uid, use ObjectId instead)
     res = db.insertData("user",[data])
-    print "########"
-    print res
 
     # deal with inserting error
     return res
