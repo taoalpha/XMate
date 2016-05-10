@@ -206,7 +206,11 @@ def computeMatchUsers(uid, pid, mydb):
         if(res["status"] != 1):
             return res
         cursor = list(res["content"])
-        tmplist = random.sample(cursor,5)
+        tmplist = []
+        if(len(cursor) >= 5):
+            tmplist = random.sample(cursor,5)
+        else:
+            tmplist = cursor
         ranlist = []
 
         tmplist.sort(key = lambda postd: postd["total_time"],reverse = True)
