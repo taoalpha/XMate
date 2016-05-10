@@ -29,7 +29,7 @@ messages = {}
 cache = {}
 counter = 0
 
-mod = 0
+mod = 1
 
 '''
 global

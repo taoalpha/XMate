@@ -37,7 +37,7 @@ def backup():
         backup data.
     '''
     global counter
-    return
+    #return
 
     counter = counter + 1
     if counter % 5 == 1:
@@ -82,7 +82,7 @@ def postUserData_api(id, profile):
             @param {string} profile - stringified user profile
 	"""
         # delegate to vsync
-	group.Send(0, id, profile)
+	group.OrderedSend(0, id, profile)
 
 	return "profile" # just for flask
 
@@ -111,6 +111,7 @@ def getUserData_api(id):
 	    if id in users:
 	    	return users[id]
 	    else:
+		print "should not see this"
 	    	res = []
 	    	nr = group.Query(Vsync.Group.ALL, 1, id, Vsync.EOLMarker(), res)
 	    	for ele in res:
