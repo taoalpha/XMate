@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import moment
+import json
 
 # Dispatch function for user api
 
@@ -24,8 +25,8 @@ def checkCache(mydb):
 
     outoftime_cache = []
     current_time = moment.now().epoch()
-    for doc  in cursor:
-        if(doc["create_time"] < current_time - 86400)
+    for doc in cursor:
+        if(doc["create_time"] < current_time - 86400):
             outoftime_cache.append(doc["_id"])
 
     id_list = outoftime_cache
@@ -63,22 +64,23 @@ def checkMsg(mydb):
 
     #update users' unprocessed msg list by removing the out of date msgs
     id_list = related_user.keys()
-    res = mydb.getData("user",id_list)
-    if(res["status"] != 1):
-        return res
-    cursor = res["content"]
+    if(len(id_list) > 0):
+        res = mydb.getData("user",id_list)
+        if(res["status"] != 1):
+            return res
+        cursor = res["content"]
 
-    id_list = []
-    data_list = []
-    for user in cursor:
-        for msg_id in related_user[user["_id"]]:
-            if(msg_id in user["unprocessed_message"]):
-                user["unprocessed_message"].remove(msg_id)
-        id_list.append(user["_id"])
-        data_list.append(user)
-    res = mydb.updateData("user",id_list, data_list)
-    if(res["status"] != 1):
-        return res
+        id_list = []
+        data_list = []
+        for user in cursor:
+            for msg_id in related_user[user["_id"]]:
+                if(msg_id in user["unprocessed_message"]):
+                    user["unprocessed_message"].remove(msg_id)
+            id_list.append(user["_id"])
+            data_list.append(user)
+        res = mydb.updateData("user",id_list, data_list)
+        if(res["status"] != 1):
+            return res
 
 
     #delete the out of time messages in database
@@ -114,7 +116,7 @@ def updateConflict(post_list,mydb):
 
 
 def updateUser(user_list, pid, t, mydb):
-    id_list = user_list
+    id_list = json.loads(json.dumps(user_list))
     res = mydb.getData("user",id_list)
     if(res["status"] != 1):
         return res
@@ -124,22 +126,24 @@ def updateUser(user_list, pid, t, mydb):
     for user in cursor:
         user["history_events"].append(pid)
         user["schedule_list"].remove(pid)
-        user["conflict_list"] = updateConflict(post_list,mydb)
+        user["conflict_list"] = updateConflict(user["schedule_list"],mydb)
         user["total_activities"] = len(user["history_events"])
         user["total_time"] += t
         user["total_hours"] = (int)(user["total_time"] / 3600)
 
-        id_list = user["unprocessed_message"]        
-        res = mydb.getData("message",id_list)
-        if(res["status"] != 1):
-            return res
-        cursor = list(res["content"])
-        for msg in cursor:
-            if(msg["post_id"] == pid):
-                del_msg.add(msg["_id"])
-                user["unprocessed_message"].remove(msg["_id"])
 
-    id_list = user_list
+        id_list = user["unprocessed_message"] 
+        if(len(id_list) != 0):
+            mres = mydb.getData("message",id_list)
+            if(mres["status"] != 1):
+                return mres
+            mcursor = list(mres["content"])
+            for msg in mcursor:
+                if(msg["post_id"] == pid):
+                    del_msg.add(msg["_id"])
+                    user["unprocessed_message"].remove(msg["_id"])
+
+    id_list = json.loads(json.dumps(user_list))
     data_list = cursor
     res = mydb.updateData("user",id_list,data_list)
     if(res["status"] != 1):
@@ -161,25 +165,26 @@ def checkSchedule(mydb):
     if(res["status"] != 1):
         return res
     cursor = res["content"]
-
     current_time = moment.now().epoch()
+    
     for doc in cursor:
         if("finish" not in doc.keys() and doc["end_time"] < current_time):
+            doc["finish"] = True
             user_list = []
             user_list = doc["member"]
             user_list.append(doc["owner"])
             t = doc["end_time"] - doc["start_time"]
 
-            res = updateUser(user_list,doc["_id"],t,mydb)
-            if(res["status"] != 1):
-                return res
+            ures = updateUser(user_list,doc["_id"],t,mydb)
+            if(ures["status"] != 1):
+                return ures
 
-            doc["finish"] = True
+
             id_list = [doc["_id"]]
             data_list = [doc]
-            res = mydb.updateData("schedule",id_list,data_list)
-            if(res["status"] != 1):
-                return res
+            sres = mydb.updateData("schedule",id_list,data_list)
+            if(sres["status"] != 1):
+                return sres
 
     return returnHelper()
 

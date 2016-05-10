@@ -27,9 +27,8 @@ users = {}
 schedules = {}
 messages = {}
 cache = {}
+loaded = False
 counter = 0
-
-mod = 0
 
 '''
 global
@@ -39,11 +38,10 @@ def backup():
         backup data.
     '''
     global counter
-    return
 
     counter = counter + 1
     if counter % 15 == 1:
-	counter = 1
+	   counter = 1
     	print "###backing#####"
     	print "user length"+str(len(users.keys()))
     	print "schedule length"+str(len(schedules.keys()))
@@ -97,12 +95,10 @@ def postUserData(id, profile):
         # for debugging
         if profile == "-1":
             print "Delete the user with id :"+id
-            if id in users:
-                del users[id]
+            del users[id]
         else:
             print "Add the user with id :"+id
-            if ord(id[0]) % 2 == mod:
-	        users[id] = profile
+	    users[id] = profile
         backup()
 
 def getUserData_api(id):
@@ -111,18 +107,9 @@ def getUserData_api(id):
             @param {string} id - user id
             @return {string} - either return the profile content or -1 for not found / deleted
 	"""
-        try:
-	    if id in users:
-	    	return users[id]
-	    else:
-	    	res = []
-	    	nr = group.Query(Vsync.Group.ALL, 1, id, Vsync.EOLMarker(), res)
-	    	for ele in res:
-	    		if ele != "-1":
-	    			return ele
-	    return "-1"
-        except:
-            return "-1"
+	if id in users and users[id] != "-1":
+		return users[id]
+	return "-1"
 
 def getUserData(id):
         '''
@@ -132,7 +119,7 @@ def getUserData(id):
 	if id in users:
 		group.Reply(users[id])
 	else:
-		group.Reply("-1")
+		group.Reply(-1)
         print("Get user with id :" + id)
 
 def removeUserData_api(id):
@@ -168,12 +155,10 @@ def postMessageData(id, message):
         # for debugging
         if message == "-1":
             print "Delete the message with id :"+id
-            if id in messages:
-                del messages[id]
+            del messages[id]
         else:
             print "Add the message with id :"+id
-            if ord(id[0]) % 2 == mod:
-	        messages[id] = message
+	    messages[id] = message
         backup()
 
 def getMessageData_api(id):
@@ -182,20 +167,9 @@ def getMessageData_api(id):
             @param {string} id - message id
             @return {string} - either return the message content or -1 for not found / deleted
 	"""
-        try:
-	    if id in messages:
-	    	return messages[id]
-	    else:
-	    	res = []
-	    	nr = group.Query(Vsync.Group.ALL, 4, id, Vsync.EOLMarker(), res)
-	    	print "result from group getting message"
-	    	print res
-	    	for ele in res:
-	    		if ele != "-1":
-	    			return ele
-	    return "-1"
-        except:
-            return "-1"
+	if id in messages and messages[id] != "-1":
+		return messages[id]
+	return "-1"
 
 def getMessageData(id):
         '''
@@ -205,7 +179,7 @@ def getMessageData(id):
 	if id in messages:
 		group.Reply(messages[id])
 	else:
-		group.Reply('-1')
+		group.Reply(-1)
 	print("Vsync server getMessageData with id=" + id.ToString())
 
 def removeMessageData_api(id):
@@ -239,12 +213,10 @@ def postScheduleData(id, schedule):
         # for debugging
         if schedule == "-1":
             print "Delete the schedule with id :"+id
-            if id in schedules:
-                del schedules[id]
+            del schedules[id]
         else:
             print "Add the schedule with id :"+id
-            if ord(id[0]) % 2 == mod:
-	        schedules[id] = schedule
+	    schedules[id] = schedule
 
         backup()
 
@@ -254,20 +226,9 @@ def getScheduleData_api(id):
             @param {string} id - schedule id
             @return {string} - either return schedule content or -1 if not found / deleted
 	"""
-        try:
-	    if id in schedules and schedules[id] != "-1":
-	    	return schedules[id]
-	    else:
-	    	res = []
-	    	nr = group.Query(Vsync.Group.ALL, 7, id, Vsync.EOLMarker(), res)
-	    	print "result from group getting"
-	    	print res
-	    	for ele in res:
-	    		if ele != "-1":
-	    			return ele
-	    return "-1"
-        except:
-            return "-1"
+	if id in schedules and schedules[id] != "-1":
+		return schedules[id]
+	return "-1"
 
 def getScheduleData(id):
         '''
@@ -277,7 +238,7 @@ def getScheduleData(id):
 	if id in schedules:
 		group.Reply(schedules[id])
 	else:
-		group.Reply('-1')
+		group.Reply(-1)
 	print("Vsync server getScheduleData with id=" + id.ToString())
 
 def removeScheduleData_api(id):
@@ -312,8 +273,7 @@ def postCacheData(id, cache_content):
         # for debugging
         if cache_content == "-1":
             print "Delete the user with id :"+id
-            if id in cache:
-                del cache[id]
+            del cache[id]
         else:
             cache[id] = cache_content
             print "Add the user with id :"+id
@@ -325,20 +285,9 @@ def getCacheData_api(id):
             @param {string} id - cache id
             @return {string} either return the found cache content or -1 represent not found / deleted
 	"""
-        try:
-	    if id in cache:
-	    	return cache[id]
-	    else:
-	    	res = []
-	    	nr = group.Query(Vsync.Group.ALL, 10, id, Vsync.EOLMarker(), res)
-	    	print "result from group getting cache"
-	    	print res
-	    	for ele in res:
-	    		if ele != "-1":
-	    			return ele
-	    return "-1"
-        except:
-            return "-1"
+	if id in cache and cache[id] != "-1":
+		return cache[id]
+	return "-1"
 
 
 def getCacheData(id):
@@ -349,7 +298,7 @@ def getCacheData(id):
 	if id in cache:
 		group.Reply(cache[id])
 	else:
-		group.Reply('-1')
+		group.Reply(-1)
 	print("Vsync server get Cache with id=" + id.ToString())
 
 def removeCacheData_api(id):
@@ -362,35 +311,6 @@ def removeCacheData_api(id):
 	group.Send(9, id, '-1')
 	return "cache"
 
-
-# for retrieving all user / message / schedule
-def getAll_api(collection):
-	"""
-            Retrieve all based on specific collection, including all keys and values.
-            @return {string} - return stringify content of the collection
-	"""
-        res = []
-	nr = group.Query(Vsync.Group.ALL, 17, collection, Vsync.EOLMarker(), res)
-        dataset = {}
-        for ele in res:
-            if ele != "-1":
-                temp = json.loads(ele)
-                for i in temp:
-                    dataset[i] = temp[i]
-
-        return json.dumps(dataset)
-
-def getAllData(collection):
-    '''
-        Retrieve data based on collection.
-        @param {string} collection - specify the collection
-    '''
-    if collection == "user":
-        group.Reply(json.dumps(users))
-    elif collection == "schedule":
-        group.Reply(json.dumps(schedules))
-    elif collection == "message":
-        group.Reply(json.dumps(messages))
 
 # for retrieving all user / message / schedule
 def getAllUsers_api():
@@ -407,13 +327,6 @@ def getAllMessages_api():
 	"""
         return json.dumps(messages)
 
-def getAllSchedules_api():
-	"""
-            Retrieve all schedules including all keys and values.
-            @return {string} - return stringify content of users
-	"""
-        return json.dumps(schedules)
-
 def getAllCache_api():
 	"""
             Retrieve all cache, including all keys and values.
@@ -421,41 +334,28 @@ def getAllCache_api():
 	"""
         return json.dumps(cache)
 
-def giveMeAll(action):
-    if action == "givemedata":
-        group.Send(16, "givemasterdata", json.dumps({"users":users,"schedules":schedules,"messages":messages,"cache":cache}))
-    elif action == "slavecall":
-        return
+def getAllSchedules_api():
+	"""
+            Retrieve all schedules including all keys and values.
+            @return {string} - return stringify content of users
+	"""
+        return json.dumps(schedules)
 
-def retrieveAll(action, dataset):
-    print "from slave server"
-    print dataset
-    global users, schedules, messages, cache
-    if action == "givemasterdata":
-        return
-    elif action == "giveslavedata":
-        data = json.loads(dataset)
-        cache = data["cache"]
-        for i in data["users"]:
-            if ord(i[0]) % 2 == mod:
-                users[i] = data["users"][i]
-        for i in data["schedules"]:
-            if ord(i[0]) % 2 == mod:
-                schedules[i] = data["schedules"][i]
-        for i in data["messages"]:
-            if ord(i[0]) % 2 == mod:
-                messages[i] = data["messages"][i]
+
 
 ### Vsycn register
 def myViewFunc(v):
+    global loaded
     print('New view: ' + v.ToString())
     print('My rank = ' + v.GetMyRank().ToString())
     for a in v.joiners:
         print('  Joining: ' + a.ToString() + ', isMyAddress='+a.isMyAddress().ToString())
     for a in v.leavers:
         print('  Leaving: ' + a.ToString() + ', isMyAddress='+a.isMyAddress().ToString())
-    if v.GetMyRank().ToString() != "0":
-        group.Send(15, "slavecall")
+    if (v.GetMyRank().ToString() == "0" and loaded == False) :
+        print "#load from recovery data"
+        loadBK()
+	loaded = True
     return
 
 
@@ -479,12 +379,10 @@ server.register_function(postCacheData_api,'postCacheData')
 server.register_function(getCacheData_api,'getCacheData')
 server.register_function(removeCacheData_api,'removeCacheData')
 # retrieve all
-server.register_function(getAll_api,'getAll')
 server.register_function(getAllUsers_api,'getAllUsers')
 server.register_function(getAllSchedules_api,'getAllSchedules')
 server.register_function(getAllMessages_api,'getAllMessages')
 server.register_function(getAllCache_api,'getAllCache')
-
 # view
 server.register_function(myViewFunc,'myViewFunc')
 
@@ -493,29 +391,23 @@ server.register_function(myViewFunc,'myViewFunc')
 
 # user related functions
 group.RegisterHandler(0, Action[str, str](postUserData))
-group.RegisterHandler(1, Action[str](getUserData))
+# group.RegisterHandler(1, Action[str](getUserData))
 # group.RegisterHandler(2, Action[str](removeUserData))
 
 # message related functions
 group.RegisterHandler(3, Action[str, str](postMessageData))
-group.RegisterHandler(4, Action[str](getMessageData))
+# group.RegisterHandler(4, Action[str](getMessageData))
 # group.RegisterHandler(5, Action[str](removeMessageData))
 
 # schedule related functions
 group.RegisterHandler(6, Action[str, str](postScheduleData))
-group.RegisterHandler(7, Action[str](getScheduleData))
+# group.RegisterHandler(7, Action[str](getScheduleData))
 # group.RegisterHandler(8, Action[str](removeScheduleData))
 
 # cache related functions
 group.RegisterHandler(9, Action[str, str](postCacheData))
-group.RegisterHandler(10, Action[str](getCacheData))
+# group.RegisterHandler(10, Action[str](getCacheData))
 # group.RegisterHandler(11, Action[str](removeCacheData))
-
-
-# get all data
-group.RegisterHandler(15, Action[str](giveMeAll))
-group.RegisterHandler(16, Action[str,str](retrieveAll))
-group.RegisterHandler(17, Action[str](getAllData))
 
 # view
 group.RegisterViewHandler(Vsync.ViewHandler(myViewFunc))
