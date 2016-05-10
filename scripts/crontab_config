@@ -1,0 +1,1 @@
+*/10 * * * * sh /root/xmate/scripts/auto_restart.sh

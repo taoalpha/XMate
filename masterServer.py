@@ -408,7 +408,7 @@ def retrieveAll(action, data):
 	schedules[i] = dataset["schedules"][i]
     for i in dataset["messages"]:
 	messages[i] = dataset["messages"][i]
-    for i in dataset["users"]:
+    for i in dataset["cache"]:
 	cache[i] = dataset["cache"][i]
 
     del dataset

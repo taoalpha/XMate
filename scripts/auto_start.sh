@@ -37,7 +37,7 @@ then
 fi
 
 # test using request if all service are running, but some internal connection lost or error happened
-SERVER_URL="192.168.99.100:1000"
+SERVER_URL="192.168.99.100:4000"
 
 HTTP_CODE=curl -s -o /dev/null -I -w "%{http_code}" $SERVER_URL
 HTTP_STATUS=curl $SERVER_URL
