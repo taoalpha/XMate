@@ -22,7 +22,7 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E03280
     echo '#!/bin/sh \nEXE_PATH=${WORKSPACE}/ironPython/bin/Release\nmono $EXE_PATH/ipy.exe "$@"' > ipy && \
     chmod +x ipy && \
     mv ipy /usr/local/bin/ && \
-    echo "IRONPYTHONPATH=${WORKSPACE}/ironPython/External.LCA_RESTRICTED/Languages/IronPython/27/Lib" >> ${WORKSPACE}/.bashrc && \
+    echo "export IRONPYTHONPATH=${WORKSPACE}/ironPython/External.LCA_RESTRICTED/Languages/IronPython/27/Lib" >> ${WORKSPACE}/.bashrc && \
     mcs -target:library ${WORKSPACE}/xmate/Vsync.cs && \
     cp -f ${WORKSPACE}/xmate/Vsync.dll ${WORKSPACE}/ironPython/bin/Release && \
     rm -rf ${WORKSPACE}/ironPython/.git
