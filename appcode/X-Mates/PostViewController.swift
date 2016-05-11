@@ -27,7 +27,6 @@ class PostViewController: UIViewController, UITableViewDataSource, UITableViewDe
 	private var catagory = "Basketball"
 	private var startTime : NSTimeInterval = 0.0
 	private var endTime : NSTimeInterval = 0.0
-	private var receiverID = ""
 	private var date = ""
 	
 	override func viewDidLoad() {
@@ -213,8 +212,9 @@ class PostViewController: UIViewController, UITableViewDataSource, UITableViewDe
 		
 		let confirm = UIAlertAction(title: "Confirm", style: UIAlertActionStyle.Default, handler: {(action) -> Void in
 			let row = sender.tag
-			self.receiverID = self.appDelegate.xmate.matches[row]["_id"] as! String
-			self.appDelegate.xmate.post(self.messageURL, mode: "invite", id: self.receiverID)
+			let rid = self.appDelegate.xmate.matches[row]["_id"] as! String
+			let pid = self.appDelegate.xmate.schedule["_id"] as! String
+			self.appDelegate.xmate.post(self.messageURL, mode: "invite", pid: pid, rid: rid)
 		})
 		let cancel = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Destructive, handler: nil)
 		

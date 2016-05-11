@@ -26,7 +26,6 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
 	private var startTime : NSTimeInterval = 0.0
 	private var endTime : NSTimeInterval = 0.0
 	private var date = ""
-	private var receiverID = ""
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -260,8 +259,9 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
 		
 		let join = UIAlertAction(title: "Join", style: UIAlertActionStyle.Default, handler: {(action) -> Void in
 			let row = sender.tag
-			self.receiverID = self.appDelegate.xmate.matches[row]["_id"] as! String
-			self.appDelegate.xmate.post(self.messageURL, mode: "join", id: self.receiverID)
+			let pid = self.appDelegate.xmate.matches[row]["_id"] as! String
+			let rid = self.appDelegate.xmate.matches[row]["owner"] as! String
+			self.appDelegate.xmate.post(self.messageURL, mode: "join", pid: pid, rid: rid)
 		})
 		let cancel = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Destructive, handler: nil)
 		

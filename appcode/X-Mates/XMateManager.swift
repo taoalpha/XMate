@@ -42,16 +42,16 @@ class XMateManager: NSObject {
 		self.get(self.userURL, mode: "user")
 	}
 	
-	func post(url: String, mode: String, id: String) {
+	func post(url: String, mode: String, pid: String, rid: String) {
 		if mode == "invite"
 		{
-			let data = ["sender_id":self.user["_id"]!, "receiver_id":id, "post_id": self.schedule["_id"]!, "type":"invite"]
+			let data = ["sender_id":self.user["_id"]!, "receiver_id":rid, "post_id":pid, "type":"invite"]
 			let res = Just.post(url, data: data).json
 			print("The invite id is \(res)")
 		}
 		else if mode == "join"
 		{
-			let data = ["sender_id":self.user["_id"]!, "receiver_id":id, "post_id": self.schedule["_id"]!, "type":"join"]
+			let data = ["sender_id":self.user["_id"]!, "receiver_id":rid, "post_id":pid, "type":"join"]
 			let res = Just.post(url, data: data).json
 			print("The join id is \(res)")
 		}

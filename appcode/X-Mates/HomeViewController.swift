@@ -95,7 +95,11 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
 				let sid = list[index]
 				self.appDelegate.xmate.get(self.scheduleURL, mode: "schedule", id: sid)
 				self.typeList.append(self.appDelegate.xmate.schedule["type"] as! String)
-				self.dateList.append(self.appDelegate.xmate.schedule["date"] as! String)
+				let formatter = NSDateFormatter()
+				formatter.dateStyle = .MediumStyle
+				let st = self.appDelegate.xmate.schedule["start_time"] as! NSTimeInterval
+				let nsdate = NSDate(timeIntervalSince1970: st)
+				self.dateList.append(formatter.stringFromDate(nsdate))
 			}
 		}
 	}
