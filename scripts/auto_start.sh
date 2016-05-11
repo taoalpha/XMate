@@ -31,7 +31,7 @@ STATUS_TWO=$?
 # if flask down and vsync still running
 #   restart the flask
 
-if [ $STATUS_ONE -eq 0 && $STATUS_TWO -ne 0 ]
+if [[ $STATUS_ONE -eq 0 && $STATUS_TWO -ne 0 ]]
 then
     killall -9 python 
     python ~/xmate/app.py & 
