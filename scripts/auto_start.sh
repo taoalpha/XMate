@@ -6,7 +6,7 @@ export IRONPYTHONPATH=/root/ironPython/External.LCA_RESTRICTED/Languages/IronPyt
 DATA_SERVER="masterServer.py"
 FLASK_SERVER="slaveServer.py"
 
-if [ $1 == 1 ]
+if [ $1 -eq 1 ]
 then
   DATA_SERVER=$FLASK_SERVER
 fi
